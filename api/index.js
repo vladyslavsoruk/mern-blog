@@ -1,6 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import authRouter from "./routes/auth.route.js";
 dotenv.config();
 
 const app = express();
@@ -19,6 +20,8 @@ const userSchema = new mongoose.Schema({
 });
 
 const User = mongoose.model("user", userSchema);
+
+app.use("/api/auth", authRouter);
 
 app.get("/", async (req, res) => {
   try {
