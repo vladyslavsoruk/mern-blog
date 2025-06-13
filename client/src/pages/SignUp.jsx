@@ -6,7 +6,7 @@ function SignUp() {
   const navigate = useNavigate();
   const [userData, setUserData] = useState({});
   const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("All fields are required!");
+  const [errorMessage, setErrorMessage] = useState(null);
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -29,6 +29,7 @@ function SignUp() {
 
       const data = await res.json();
       if (data.error) {
+        setLoading(false);
         return setErrorMessage(data.error);
       }
 
@@ -44,7 +45,6 @@ function SignUp() {
   };
   const handleChange = (e) => {
     setUserData({ ...userData, [e.target.id]: e.target.value.trim() });
-    console.log(userData);
   };
 
   return (
