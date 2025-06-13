@@ -48,8 +48,8 @@ function SignUp() {
   };
 
   return (
-    <div className="min-h-screen mt-20">
-      <div className="flex p-3 max-w-3xl mx-auto flex-col md:flex-row md:items-center gap-5">
+    <div className="min-h-[calc(100vh-62px)] w-full flex items-center justify-center">
+      <div className="flex w-full p-3 max-w-3xl mx-auto flex-col md:flex-row md:items-center gap-5">
         {/* LEFT side */}
         <div className="flex-1">
           <Link
@@ -59,7 +59,7 @@ function SignUp() {
             <span className="px-2 py-1 text-4xl bg-gradient-to-r from-pink-500 via-purple-500 to-violet-500 rounded-lg text-white">
               Vlad's
             </span>
-            Blog
+            &nbsp; Blog
           </Link>
           <p className="text-sm mt-5">
             This is a demo project for a blog application
