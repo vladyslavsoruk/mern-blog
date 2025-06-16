@@ -1,5 +1,10 @@
 import {
+  Avatar,
   Button,
+  Dropdown,
+  DropdownDivider,
+  DropdownHeader,
+  DropdownItem,
   Navbar,
   NavbarCollapse,
   NavbarLink,
@@ -9,9 +14,12 @@ import {
 import { Link, useLocation } from "react-router-dom";
 import { AiOutlineSearch } from "react-icons/ai";
 import { FaMoon } from "react-icons/fa";
+import { useSelector } from "react-redux";
 
 function Header() {
   const path = useLocation().pathname;
+
+  const { user: currentUser } = useSelector((state) => state.user);
 
   return (
     <Navbar className="border-b-2">
@@ -38,7 +46,7 @@ function Header() {
         <AiOutlineSearch className="text-2xl text-gray-500" />
       </Button>
 
-      <div className="flex gap-2 md:order-2">
+      <div className="flex gap-4 md:order-2 items-center">
         <Button
           className="px-4 py-1 hidden sm:inline cursor-pointer"
           color="light"
@@ -46,11 +54,40 @@ function Header() {
           <FaMoon />
         </Button>
 
-        <Link to="/sign-in">
-          <Button className="bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 text-white hover:bg-gradient-to-br focus:ring-blue-300 dark:focus:ring-blue-800 cursor-pointer">
-            Sign In
-          </Button>
-        </Link>
+        {currentUser ? (
+          <Dropdown
+            arrowIcon={false}
+            inline
+            label={
+              <Avatar
+                alt="User settings"
+                img={currentUser.profilePicture}
+                rounded={true}
+                className="cursor-pointer"
+              />
+            }
+          >
+            <DropdownHeader>
+              <span className="block text-sm font-medium text-center">
+                @{currentUser.username}
+              </span>
+              <span className="block truncate text-sm font-medium text-center">
+                {currentUser.email}
+              </span>
+            </DropdownHeader>
+            <Link to="/dashboard?tab=profile">
+              <DropdownItem>Profile</DropdownItem>
+            </Link>
+            <DropdownDivider />
+            <DropdownItem>Logout</DropdownItem>
+          </Dropdown>
+        ) : (
+          <Link to="/sign-in">
+            <Button className="bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 text-white hover:bg-gradient-to-br focus:ring-blue-300 dark:focus:ring-blue-800 cursor-pointer">
+              Sign In
+            </Button>
+          </Link>
+        )}
 
         <NavbarToggle className="cursor-pointer" />
       </div>
