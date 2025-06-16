@@ -63,3 +63,50 @@ export const signin = async (req, res, next) => {
     next(error);
   }
 };
+
+export const google = async (req, res, next) => {
+  const { name, email, googlePhotoUrl } = req.body;
+  if (!name || !email || !googlePhotoUrl) {
+    return next(errorHandler(400, "All fields are required"));
+  }
+  try {
+    let user = await User.findOne({ email });
+    if (!user) {
+      const generatedPassword =
+        Math.random().toString(36).slice(-8) +
+        Math.random().toString(36).slice(-8);
+
+      const hashedPassword = bcryptjs.hashSync(generatedPassword, 10);
+
+      // If user does not exist, we create a new user with a generated password
+      user = await User.create({
+        username:
+          name.toString().toLowerCase().split(" ").join("") +
+          Math.random().toString(9).slice(-4),
+        email,
+        password: hashedPassword,
+        profilePicture: googlePhotoUrl,
+      });
+      await user.save();
+    }
+
+    const { password: pass, ...userWithoutPassword } = user._doc;
+
+    const token = jwt.sign(
+      {
+        id: user._id,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d", algorithm: "HS256" }
+    );
+
+    res
+      .status(200)
+      .cookie("access_token", token, {
+        httpOnly: true,
+      })
+      .json(userWithoutPassword);
+  } catch (error) {
+    next(error);
+  }
+};

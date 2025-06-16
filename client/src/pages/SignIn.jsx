@@ -7,6 +7,7 @@ import {
   signInSuccess,
   signInFailure,
 } from "../redux/user/userSlice.js";
+import OAuth from "../components/OAuth.jsx";
 
 function SignIn() {
   const navigate = useNavigate();
@@ -113,7 +114,7 @@ function SignIn() {
             </div>
             <Button
               type="submit"
-              className="hover:cursor-pointer"
+              className="hover:cursor-pointer bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 text-white hover:bg-gradient-to-br focus:ring-blue-300 dark:focus:ring-blue-800"
               disabled={loading}
             >
               {loading ? (
@@ -125,6 +126,7 @@ function SignIn() {
                 "Sign in"
               )}
             </Button>
+            <OAuth />
           </form>
 
           {errorMessage && (

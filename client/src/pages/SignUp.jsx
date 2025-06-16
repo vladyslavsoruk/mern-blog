@@ -1,6 +1,7 @@
 import { Label, TextInput, Button, Alert, Spinner } from "flowbite-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import OAuth from "../components/OAuth";
 
 function SignUp() {
   const navigate = useNavigate();
@@ -106,7 +107,7 @@ function SignUp() {
             </div>
             <Button
               type="submit"
-              className="hover:cursor-pointer"
+              className="hover:cursor-pointer bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 text-white hover:bg-gradient-to-br focus:ring-blue-300 dark:focus:ring-blue-800"
               disabled={loading}
             >
               {loading ? (
@@ -118,6 +119,7 @@ function SignUp() {
                 "Sign up"
               )}
             </Button>
+            <OAuth />
           </form>
 
           <div className="flex gap-2 text-sm mt-5">
