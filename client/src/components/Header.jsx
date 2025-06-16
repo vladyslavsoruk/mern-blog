@@ -14,13 +14,15 @@ import {
 import { Link, useLocation } from "react-router-dom";
 import { AiOutlineSearch } from "react-icons/ai";
 import { FaMoon } from "react-icons/fa";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { toggleTheme } from "../redux/theme/themeSlice";
 
 function Header() {
   const path = useLocation().pathname;
 
   const { user: currentUser } = useSelector((state) => state.user);
 
+  const dispatch = useDispatch();
   return (
     <Navbar className="border-b-2">
       <Link
@@ -50,6 +52,7 @@ function Header() {
         <Button
           className="px-4 py-1 hidden sm:inline cursor-pointer"
           color="light"
+          onClick={() => dispatch(toggleTheme())}
         >
           <FaMoon />
         </Button>
