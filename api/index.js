@@ -2,10 +2,13 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import authRouter from "./routes/auth.route.js";
+import userRouter from "./routes/user.route.js";
+import cookieParser from "cookie-parser";
 dotenv.config();
 
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 
 // Подключение к MongoDB
 mongoose
@@ -22,6 +25,7 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.model("user", userSchema);
 
 app.use("/api/auth", authRouter);
+app.use("/api/user", userRouter);
 
 app.get("/", async (req, res) => {
   try {
@@ -46,19 +50,19 @@ app.post("/", async (req, res) => {
   }
 });
 
-app.put("/:id", async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id);
-    user.name = req.body.name;
-    user.email = req.body.email;
-    user.save();
-    res
-      .status(200)
-      .send(`User with id ${req.params.id} was successfully updated !`);
-  } catch (error) {
-    res.status(404).send(`User with id ${req.params.id} was not found !`);
-  }
-});
+// app.put("/:id", async (req, res) => {
+//   try {
+//     const user = await User.findById(req.params.id);
+//     user.name = req.body.name;
+//     user.email = req.body.email;
+//     user.save();
+//     res
+//       .status(200)
+//       .send(`User with id ${req.params.id} was successfully updated !`);
+//   } catch (error) {
+//     res.status(404).send(`User with id ${req.params.id} was not found !`);
+//   }
+// });
 
 app.delete("/:id", async (req, res) => {
   try {

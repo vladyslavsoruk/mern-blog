@@ -22,7 +22,10 @@ export const signup = async (req, res, next) => {
       password: bcryptjs.hashSync(password, 10),
     });
     await user.save();
-    res.status(201).send(user);
+
+    const { password: pass, ...userWithoutPassword } = user._doc;
+
+    res.status(201).json(userWithoutPassword);
   } catch (error) {
     next(error);
   }
