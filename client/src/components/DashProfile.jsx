@@ -16,8 +16,10 @@ import {
   deleteStart,
   deleteSuccess,
   deleteFailure,
+  signOutSuccess,
 } from "../redux/user/userSlice";
 import { useDispatch } from "react-redux";
+import { set } from "mongoose";
 
 function DashProfile() {
   const { user: currentUser, error } = useSelector((state) => state.user);
@@ -147,6 +149,21 @@ function DashProfile() {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("/api/user/logout", {
+        method: "POST",
+      });
+      if (!response.ok) {
+        setUserUpdateError("Failed to logout");
+        return new Error("Failed to logout");
+      }
+      dispatch(signOutSuccess()); // Clear user state on logout
+    } catch (error) {
+      console.error("Logout error:", error.message);
+    }
+  };
+
   return (
     <div className="w-full max-w-lg mx-auto p-6 rounded-lg">
       <h1 className="text-2xl font-bold mb-4 text-center">Profile</h1>
@@ -216,7 +233,9 @@ function DashProfile() {
         <span className="cursor-pointer" onClick={() => setShowModal(true)}>
           Delete Account
         </span>
-        <span className="cursor-pointer">Logout</span>
+        <span className="cursor-pointer" onClick={handleLogout}>
+          Logout
+        </span>
       </div>
 
       <Modal
@@ -229,14 +248,14 @@ function DashProfile() {
         <ModalBody>
           <div className="text-center">
             <FaExclamationCircle className="text-6xl mb-4 mx-auto text-red-500" />
-            <h3 className="mb-5 text-lg text-gray-500">
+            <h3 className="mb-5 text-lg text-gray-500 dark:text-gray-200">
               Are you sure you want to delete your account?
             </h3>
             <div className="flex justify-between">
               <Button color="failure" onClick={handleDeleteUser}>
                 Yes, I'm sure
               </Button>
-              <Button color="gray" onClick={() => setShowModal(false)}>
+              <Button color="light" onClick={() => setShowModal(false)}>
                 No, cancel
               </Button>
             </div>

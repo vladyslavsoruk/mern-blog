@@ -37,7 +37,6 @@ function OAuth() {
         throw new Error(data.error);
       }
       if (res.ok) {
-        console.log("User signed in successfully:", data);
         dispatch(signInSuccess(data));
         navigate("/");
       }

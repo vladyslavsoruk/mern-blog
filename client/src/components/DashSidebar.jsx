@@ -8,16 +8,33 @@ import { useEffect, useState } from "react";
 
 import { HiArrowSmRight, HiUser } from "react-icons/hi";
 import { useLocation } from "react-router-dom";
+import { signOutSuccess } from "../redux/user/userSlice";
+import { useDispatch } from "react-redux";
 
 function DashSidebar() {
   const location = useLocation();
   const [tab, setTab] = useState("");
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const currentTab = urlParams.get("tab");
     setTab(currentTab);
   }, [location.search]);
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("/api/user/logout", {
+        method: "POST",
+      });
+      if (!response.ok) {
+        return new Error("Failed to logout");
+      }
+      dispatch(signOutSuccess()); // Clear user state on logout
+    } catch (error) {
+      console.error("Logout error:", error.message);
+    }
+  };
 
   return (
     <Sidebar className="h-full w-full">
@@ -32,24 +49,13 @@ function DashSidebar() {
           >
             Profile
           </SidebarItem>
-          <SidebarItem icon={HiArrowSmRight} className="cursor-pointer">
+          <SidebarItem
+            icon={HiArrowSmRight}
+            className="cursor-pointer"
+            onClick={handleLogout}
+          >
             Logout
           </SidebarItem>
-          {/* <SidebarItem href="/dashboard?tab=settings" icon="cog">
-            Settings
-          </SidebarItem>
-          <SidebarItem href="/dashboard?tab=projects" icon="folder">
-            Projects
-          </SidebarItem>
-          <SidebarItem href="/dashboard?tab=reports" icon="chart-bar">
-            Reports
-          </SidebarItem>
-          <SidebarItem href="/dashboard?tab=help" icon="question-circle">
-            Help
-          </SidebarItem>
-          <SidebarItem href="/dashboard?tab=logout" icon="sign-out-alt">
-            Logout
-          </SidebarItem> */}
         </SidebarItemGroup>
       </SidebarItems>
     </Sidebar>
