@@ -15,6 +15,14 @@ export const signup = async (req, res, next) => {
   ) {
     next(errorHandler(400, "All fields are required"));
   }
+
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    return next(
+      errorHandler(409, "User with this email already exists. Please sign in")
+    );
+  }
+
   try {
     const user = await User.create({
       username,
