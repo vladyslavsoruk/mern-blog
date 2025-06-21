@@ -11,6 +11,7 @@ import { useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { useRef } from "react";
+import { Link } from "react-router-dom";
 
 function CreatePost() {
   const [contentValue, setContentValue] = useState("");
@@ -23,6 +24,8 @@ function CreatePost() {
   const [imageFileUploadSuccess, setImageFileUploadSuccess] = useState(null);
   const [postCreationSuccess, setPostCreationSuccess] = useState(null);
   const [postCreationError, setPostCreationError] = useState(null);
+  const [postSLug, setPostSlug] = useState(null);
+  const [postDataLoading, setPostDataLoading] = useState(null);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -88,6 +91,7 @@ function CreatePost() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setPostDataLoading(true);
     setPostCreationSuccess(null);
     setPostCreationError(null);
 
@@ -104,10 +108,10 @@ function CreatePost() {
       !Object.keys(postData).includes("content")
     ) {
       setPostCreationError("Not enough data to create a post");
+      setPostDataLoading(false);
       return;
     }
 
-    console.log("Post Data:", postData);
     try {
       // dispatch(updateStart());
       const response = await fetch(`/api/post/create`, {
@@ -123,14 +127,19 @@ function CreatePost() {
       if (!response.ok) {
         // dispatch(updateFailure(data.error || "Failed to update profile"));
         setPostCreationError(data.error || "Failed to create a post");
+        setPostDataLoading(false);
         return;
       }
 
       // dispatch(updateSuccess(data));
       setPostCreationSuccess("The post was successfully created!");
+      setPostSlug(data.slug);
+      setPostDataLoading(false);
+
       // setFormData({});
     } catch (error) {
       // dispatch(updateFailure(error.message));
+      setPostDataLoading(false);
       setPostCreationError(
         error.message || "Something went wrong while creating the post"
       );
@@ -238,8 +247,20 @@ function CreatePost() {
           required
           placeholder="Write your post content here..."
         />
-        <Button type="submit" color={"green"} className="w-full">
-          Publish Post
+        <Button
+          type="submit"
+          color={"green"}
+          className="w-full font-semibold"
+          disabled={postDataLoading}
+        >
+          {postDataLoading ? (
+            <>
+              <Spinner size="sm" />
+              <span className="ml-2">Loading...</span>
+            </>
+          ) : (
+            "Publish Post"
+          )}
         </Button>
       </form>
 
@@ -251,6 +272,12 @@ function CreatePost() {
       {postCreationSuccess && (
         <Alert color="success" className="mt-4">
           {postCreationSuccess}
+          <Link
+            to={`/post/${postSLug}`}
+            className="ml-2 text-blue-500 hover:underline"
+          >
+            Go to the post page
+          </Link>
         </Alert>
       )}
     </div>
