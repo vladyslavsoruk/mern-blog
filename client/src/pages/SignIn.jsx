@@ -78,8 +78,8 @@ function SignIn() {
           >
             <span className="px-2 py-1 text-4xl bg-gradient-to-r from-pink-500 via-purple-500 to-violet-500 rounded-lg text-white">
               Vlad's
-            </span>
-            &nbsp; Blog
+            </span>{" "}
+            Blog
           </Link>
           <p className="text-sm mt-5">
             This is a demo project for a blog application
@@ -120,7 +120,7 @@ function SignIn() {
               {loading ? (
                 <>
                   <Spinner size="sm" />
-                  &nbsp; <span>Loading...</span>
+                  <span className="ml-2">Loading...</span>
                 </>
               ) : (
                 "Sign in"

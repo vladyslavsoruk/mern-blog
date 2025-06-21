@@ -47,8 +47,8 @@ function Header() {
       >
         <span className="px-2 py-1 bg-gradient-to-r from-pink-500 via-purple-500 to-violet-500 rounded-lg text-white">
           Vlad's
-        </span>
-        &nbsp; Blog
+        </span>{" "}
+        Blog
       </Link>
 
       <form>

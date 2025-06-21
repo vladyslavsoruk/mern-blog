@@ -52,7 +52,7 @@ function OAuth() {
       onClick={handleGoogleClick}
     >
       <AiFillGoogleCircle className="text-2xl" />
-      <span>&nbsp; Continue with Google</span>
+      <span className="ml-2">Continue with Google</span>
     </Button>
   );
 }

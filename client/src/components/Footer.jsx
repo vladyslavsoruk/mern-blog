@@ -28,8 +28,8 @@ function FooterComponent() {
             >
               <span className="px-2 py-1 text-lg bg-gradient-to-r from-pink-500 via-purple-500 to-violet-500 rounded-lg text-white">
                 Vlad's
-              </span>
-              &nbsp; Blog
+              </span>{" "}
+              Blog
             </Link>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-6">

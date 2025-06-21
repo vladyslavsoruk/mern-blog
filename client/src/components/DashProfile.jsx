@@ -6,6 +6,7 @@ import {
   Modal,
   ModalHeader,
   ModalBody,
+  Spinner,
 } from "flowbite-react";
 import { useEffect, useRef, useState } from "react";
 import { FaExclamationCircle } from "react-icons/fa";
@@ -20,9 +21,14 @@ import {
 } from "../redux/user/userSlice";
 import { useDispatch } from "react-redux";
 import { set } from "mongoose";
+import { Link } from "react-router-dom";
 
 function DashProfile() {
-  const { user: currentUser, error } = useSelector((state) => state.user);
+  const {
+    user: currentUser,
+    error,
+    loading,
+  } = useSelector((state) => state.user);
   const [imageFile, setImageFile] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(null);
   const [imageFileUploadError, setImageFileUploadError] = useState(null);
@@ -210,7 +216,23 @@ function DashProfile() {
           placeholder="Password"
           onChange={handleChange}
         />
-        <Button type="submit">Update</Button>
+        <Button type="submit" disabled={loading}>
+          {loading ? (
+            <>
+              <Spinner size="sm" />
+              <span className="ml-2">Loading...</span>
+            </>
+          ) : (
+            "Update"
+          )}
+        </Button>
+        {currentUser.isAdmin && (
+          <Link to={"/create-post"}>
+            <Button type="button" color="green" className="w-full">
+              Create a post
+            </Button>
+          </Link>
+        )}
       </form>
 
       {userUpdateError && (
@@ -223,11 +245,11 @@ function DashProfile() {
           {userUpdateSuccess}
         </Alert>
       )}
-      {error && (
+      {/* {error && (
         <Alert color="failure" className="mt-4">
           {error}
         </Alert>
-      )}
+      )} */}
 
       <div className="flex justify-between mt-4 text-red-500">
         <span className="cursor-pointer" onClick={() => setShowModal(true)}>
