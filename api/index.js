@@ -5,6 +5,7 @@ import authRouter from "./routes/auth.route.js";
 import userRouter from "./routes/user.route.js";
 import cookieParser from "cookie-parser";
 import User from "./models/user.model.js";
+import postRouter from "./routes/post.route.js";
 dotenv.config();
 
 const app = express();
@@ -19,6 +20,7 @@ mongoose
 
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
+app.use("/api/post", postRouter);
 
 app.get("/", async (req, res) => {
   try {
