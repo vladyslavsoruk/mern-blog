@@ -9,6 +9,11 @@ export const createPost = async (req, res, next) => {
     return next(errorHandler(400, "Title and content are required"));
   }
 
+  const existingPost = await Post.findOne({ title: req.body.title });
+  if (existingPost) {
+    return next(errorHandler(409, "Post with this title already exists"));
+  }
+
   const slug = req.body.title
     .split(" ")
     .join("-")
