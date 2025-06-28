@@ -1,4 +1,7 @@
 import {
+  Alert,
+  Button,
+  Spinner,
   Table,
   TableBody,
   TableCell,
@@ -13,6 +16,8 @@ import { Link } from "react-router-dom";
 function DashPosts() {
   const { user: currentUser } = useSelector((state) => state.user);
   const [userPosts, setUserPosts] = useState([]);
+  const [noPosts, setNoPosts] = useState(false);
+  const [showMoreBtn, setShowMoreBtn] = useState(true);
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -23,6 +28,14 @@ function DashPosts() {
           throw new Error("Something went wrong while fetching posts");
         }
         const data = await response.json();
+
+        if (data.posts.length === 0) {
+          setNoPosts(true);
+        }
+        if (data.posts.length < 9) {
+          setShowMoreBtn(false);
+        }
+
         setUserPosts(data.posts);
       } catch (error) {
         console.error(
@@ -32,10 +45,33 @@ function DashPosts() {
       }
     };
     if (currentUser.isAdmin) {
-      // Fetch all posts if the user is an admin
+      // Fetch 9 first posts if the user is an admin
       fetchPosts();
     }
   }, [currentUser._id]);
+
+  const handleShowMoreBtn = async () => {
+    const startIndex = userPosts.length;
+    try {
+      const response = await fetch(
+        `/api/post/get?authorId=${currentUser._id}&startIndex=${startIndex}`
+      );
+      if (!response.ok) {
+        throw new Error("Something went wrong while fetching posts");
+      }
+      const data = await response.json();
+      if (data.posts.length < 9) {
+        setShowMoreBtn(false);
+      }
+      setUserPosts((prevPosts) => [...prevPosts, ...data.posts]);
+    } catch (error) {
+      console.error(
+        "There was a problem with the fetch operation:",
+        error.message
+      );
+    }
+  };
+
   return (
     <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-gray-400 dark:scrollbar-track-gray-700 dark:scrollbar-thumb-gray-500">
       {currentUser.isAdmin && userPosts.length > 0 ? (
@@ -88,9 +124,22 @@ function DashPosts() {
               ))}
             </TableBody>
           </Table>
+          {showMoreBtn && (
+            <Button className="mt-3 mx-auto" onClick={handleShowMoreBtn}>
+              Show more...
+            </Button>
+          )}
         </>
       ) : (
-        <p>You have no posts yet!</p>
+        <>
+          <Spinner size="sm" />
+          <span className="ml-2">Loading...</span>
+        </>
+      )}
+      {noPosts && (
+        <p className="text-center font-semibold mt-3">
+          You have no posts yet...
+        </p>
       )}
     </div>
   );
