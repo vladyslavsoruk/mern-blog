@@ -60,6 +60,10 @@ export const getPosts = async (req, res, next) => {
 
     const totalPosts = await Post.countDocuments();
 
+    const adminTotalPosts = await Post.countDocuments({
+      author: req.query.authorId,
+    });
+
     const now = new Date();
 
     const oneMonthAgo = new Date(
@@ -72,7 +76,21 @@ export const getPosts = async (req, res, next) => {
       createdAt: { $gte: oneMonthAgo },
     });
 
-    res.status(200).json({ posts, totalPosts, lastMonthPosts });
+    res
+      .status(200)
+      .json({ posts, adminTotalPosts, totalPosts, lastMonthPosts });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deletePost = async (req, res, next) => {
+  if (!req.user.isAdmin || req.user.id !== req.params.userId) {
+    return next(errorHandler(403, "You are not allowed to delete the post"));
+  }
+  try {
+    await Post.findByIdAndDelete(req.params.postId);
+    res.status(200).json("The post has been successfully deleted");
   } catch (error) {
     next(error);
   }

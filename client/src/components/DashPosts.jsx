@@ -1,6 +1,9 @@
 import {
   Alert,
   Button,
+  Modal,
+  ModalBody,
+  ModalHeader,
   Spinner,
   Table,
   TableBody,
@@ -10,6 +13,7 @@ import {
   TableRow,
 } from "flowbite-react";
 import { useEffect, useState } from "react";
+import { FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
@@ -18,6 +22,10 @@ function DashPosts() {
   const [userPosts, setUserPosts] = useState([]);
   const [noPosts, setNoPosts] = useState(false);
   const [showMoreBtn, setShowMoreBtn] = useState(true);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [postToDeleteData, setPostToDeleteData] = useState(null);
+  const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
+
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -32,7 +40,7 @@ function DashPosts() {
         if (data.posts.length === 0) {
           setNoPosts(true);
         }
-        if (data.posts.length < 9) {
+        if (data.adminTotalPosts <= 9) {
           setShowMoreBtn(false);
         }
 
@@ -63,10 +71,45 @@ function DashPosts() {
       if (data.posts.length < 9) {
         setShowMoreBtn(false);
       }
+
       setUserPosts((prevPosts) => [...prevPosts, ...data.posts]);
+
+      if (data.adminTotalPosts === userPosts.length) {
+        console.log("YEAH BROOO, data.adminTotalPosts === userPosts.length");
+
+        setShowMoreBtn(false);
+      }
     } catch (error) {
       console.error(
         "There was a problem with the fetch operation:",
+        error.message
+      );
+    }
+  };
+
+  const handleDeletePost = async () => {
+    try {
+      const response = await fetch(
+        `/api/post/delete/${postToDeleteData.id}/${currentUser._id}`,
+        {
+          method: "DELETE",
+        }
+      );
+      setShowDeleteModal(false);
+      if (response.ok) {
+        setUserPosts((prevPosts) =>
+          prevPosts.filter((post) => post._id !== postToDeleteData.id)
+        );
+
+        setShowDeleteSuccess(true);
+
+        setTimeout(() => {
+          setShowDeleteSuccess(false);
+        }, 3000);
+      }
+    } catch (error) {
+      console.error(
+        "Something went wrong while deleting the post:",
         error.message
       );
     }
@@ -109,7 +152,16 @@ function DashPosts() {
                   </TableCell>
                   <TableCell>{post.category}</TableCell>
                   <TableCell>
-                    <button className="text-red-500 hover:underline">
+                    <button
+                      className="text-red-500 hover:underline"
+                      onClick={() => {
+                        setShowDeleteModal(true);
+                        setPostToDeleteData({
+                          id: post._id,
+                          title: post.title,
+                        });
+                      }}
+                    >
                       Delete
                     </button>
                   </TableCell>
@@ -140,6 +192,39 @@ function DashPosts() {
         <p className="text-center font-semibold mt-3">
           You have no posts yet...
         </p>
+      )}
+
+      <Modal
+        show={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        popup
+        size={"md"}
+      >
+        <ModalHeader />
+        <ModalBody>
+          <div className="text-center">
+            <FaExclamationCircle className="text-6xl mb-4 mx-auto text-red-500" />
+            <h3 className="mb-5 text-lg text-gray-500 dark:text-gray-200">
+              Are you sure you want to delete the post{" "}
+              <span className="font-semibold">«{postToDeleteData?.title}»</span>{" "}
+              ?
+            </h3>
+            <div className="flex justify-between">
+              <Button color="failure" onClick={handleDeletePost}>
+                Yes, I'm sure
+              </Button>
+              <Button color="light" onClick={() => setShowDeleteModal(false)}>
+                No, cancel
+              </Button>
+            </div>
+          </div>
+        </ModalBody>
+      </Modal>
+      {showDeleteSuccess && (
+        <div className="flex gap-2 px-4 py-3 items-center fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white  rounded shadow-lg transition-opacity duration-500 animate-fade-in-out z-50">
+          <FaCheckCircle className="text-xl " />
+          <span>Post was successfully deleted!</span>
+        </div>
       )}
     </div>
   );

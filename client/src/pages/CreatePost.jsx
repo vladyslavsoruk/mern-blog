@@ -181,20 +181,22 @@ function CreatePost() {
               onChange={handleImageChange}
               ref={filePickerReference}
             />
-            <Button
-              type="button"
-              onClick={handleImageUpload}
-              disabled={imageFileLoading}
-            >
-              {imageFileLoading ? (
-                <>
-                  <Spinner size="sm" />
-                  <span className="ml-2">Loading...</span>
-                </>
-              ) : (
-                "Upload image"
-              )}
-            </Button>
+            {imageFile && (
+              <Button
+                type="button"
+                onClick={handleImageUpload}
+                disabled={imageFileLoading}
+              >
+                {imageFileLoading ? (
+                  <>
+                    <Spinner size="sm" />
+                    <span className="ml-2">Loading...</span>
+                  </>
+                ) : (
+                  "Upload image"
+                )}
+              </Button>
+            )}
           </div>
 
           {imageFileUrl && (
