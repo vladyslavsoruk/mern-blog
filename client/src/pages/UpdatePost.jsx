@@ -7,13 +7,15 @@ import {
   TextInput,
 } from "flowbite-react";
 import { RxCross2 } from "react-icons/rx";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 
-function CreatePost() {
+function UpdatePost() {
+  const { user: currentUser } = useSelector((state) => state.user);
   const [contentValue, setContentValue] = useState("");
   const [formData, setFormData] = useState({});
   const filePickerReference = useRef(null);
@@ -22,10 +24,34 @@ function CreatePost() {
   const [imageFileLoading, setImageFileLoading] = useState(null);
   const [imageFileUploadError, setImageFileUploadError] = useState(null);
   const [imageFileUploadSuccess, setImageFileUploadSuccess] = useState(null);
-  const [postCreationSuccess, setPostCreationSuccess] = useState(null);
-  const [postCreationError, setPostCreationError] = useState(null);
+  const [postUpdateSuccess, setPostUpdateSuccess] = useState(null);
+  const [postUpdateError, setPostUpdateError] = useState(null);
   const [postSLug, setPostSlug] = useState(null);
   const [postDataLoading, setPostDataLoading] = useState(null);
+  const initialContentRef = useRef("");
+  const { postId } = useParams();
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await fetch(`/api/post/get?postId=${postId}`);
+        const data = await response.json();
+        if (!response.ok) {
+          setPostUpdateError("Something went wrong while fetching the post");
+          return;
+        }
+
+        setPostUpdateError(null);
+        setFormData(data.posts[0]);
+        setImageFileUploadSuccess("Image uploaded successfully!");
+        setImageFileUrl(data.posts[0].image);
+        setContentValue(data.posts[0].content);
+      } catch (error) {
+        console.error("Error fetching post data:", error.message);
+      }
+    }
+    fetchData();
+  }, [postId]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -92,8 +118,8 @@ function CreatePost() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setPostDataLoading(true);
-    setPostCreationSuccess(null);
-    setPostCreationError(null);
+    setPostUpdateSuccess(null);
+    setPostUpdateError(null);
 
     const postData = {
       ...formData,
@@ -107,48 +133,47 @@ function CreatePost() {
       !Object.keys(postData).includes("title") ||
       !Object.keys(postData).includes("content")
     ) {
-      setPostCreationError("Not enough data to create a post");
+      setPostUpdateError("Not enough data to update the post");
       setPostDataLoading(false);
       return;
     }
 
     try {
-      // dispatch(updateStart());
-      const response = await fetch(`/api/post/create`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(postData),
-      });
+      const response = await fetch(
+        `/api/post/update/${postId}/${currentUser._id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(postData),
+        }
+      );
 
       const data = await response.json();
 
       if (!response.ok) {
-        // dispatch(updateFailure(data.error || "Failed to update profile"));
-        setPostCreationError(data.error || "Failed to create a post");
+        setPostUpdateError(data.error || "Failed to update the post");
         setPostDataLoading(false);
         return;
       }
 
-      // dispatch(updateSuccess(data));
-      setPostCreationSuccess("The post was successfully created!");
+      setPostUpdateSuccess("The post was successfully updated!");
       setPostSlug(data.slug);
       setPostDataLoading(false);
-
-      // setFormData({});
     } catch (error) {
-      // dispatch(updateFailure(error.message));
       setPostDataLoading(false);
-      setPostCreationError(
-        error.message || "Something went wrong while creating the post"
+      setPostUpdateError(
+        error.message || "Something went wrong while updating the post"
       );
     }
   };
 
   return (
     <div className="p-3 max-w-3xl mx-auto min-h-[calc(100vh-62px)]">
-      <h1 className="text-center text-3xl my-7 font-semibold">Create a post</h1>
+      <h1 className="text-center text-3xl my-7 font-semibold">
+        Update the post
+      </h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 mb-4">
         <div className="flex flex-col sm:flex-row gap-4 justify-between">
           <TextInput
@@ -158,8 +183,13 @@ function CreatePost() {
             id="title"
             className="flex-1"
             onChange={handleFormChange}
+            value={formData.title}
           />
-          <Select id="category" onChange={handleFormChange}>
+          <Select
+            id="category"
+            onChange={handleFormChange}
+            value={formData.category}
+          >
             <option value="uncategorized">Select a category</option>
             <option value="javascript">javascript</option>
             <option value="react">React</option>
@@ -261,19 +291,19 @@ function CreatePost() {
               <span className="ml-2">Loading...</span>
             </>
           ) : (
-            "Publish the post"
+            "Update the post"
           )}
         </Button>
       </form>
 
-      {postCreationError && (
+      {postUpdateError && (
         <Alert color="failure" className="mt-4">
-          {postCreationError}
+          {postUpdateError}
         </Alert>
       )}
-      {postCreationSuccess && (
+      {postUpdateSuccess && (
         <Alert color="success" className="mt-4">
-          {postCreationSuccess}
+          {postUpdateSuccess}
           <Link
             to={`/post/${postSLug}`}
             className="ml-2 text-blue-500 hover:underline"
@@ -286,4 +316,4 @@ function CreatePost() {
   );
 }
 
-export default CreatePost;
+export default UpdatePost;
