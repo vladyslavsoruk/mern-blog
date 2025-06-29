@@ -14,8 +14,13 @@ import {
 } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RxCrossCircled } from "react-icons/rx";
+import {
+  deleteFailure,
+  deleteStart,
+  deleteSuccess,
+} from "../redux/user/userSlice";
 
 function DashUsers() {
   const { user: currentUser } = useSelector((state) => state.user);
@@ -25,6 +30,7 @@ function DashUsers() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [userToDeleteData, setUserToDeleteData] = useState(null);
   const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -69,11 +75,15 @@ function DashUsers() {
         setShowMoreBtn(false);
       }
 
-      setUsersData((prevUsers) => [...prevUsers, ...data.users]);
+      setUsersData((prevUsers) => {
+        const updatedUsers = [...prevUsers, ...data.users];
 
-      if (data.totalUsers === usersData.length) {
-        setShowMoreBtn(false);
-      }
+        if (updatedUsers.length === data.totalUsers) {
+          setShowMoreBtn(false);
+        }
+
+        return updatedUsers;
+      });
     } catch (error) {
       console.error(
         "There was a problem with the fetch operation:",
@@ -82,14 +92,34 @@ function DashUsers() {
     }
   };
 
-  const handleDeleteUser = async () => {
+  const handleDeleteCurrentUser = async () => {
+    setShowDeleteModal(false);
     try {
-      const response = await fetch(
-        `/api/user/delete/${userToDeleteData.id}/${currentUser._id}`,
-        {
-          method: "DELETE",
-        }
-      );
+      dispatch(deleteStart());
+      const response = await fetch(`/api/user/delete/${currentUser._id}`, {
+        method: "DELETE",
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        dispatch(deleteFailure(data.error || "Failed to delete profile"));
+        return;
+      }
+      dispatch(deleteSuccess());
+    } catch (error) {
+      dispatch(deleteFailure(error.message));
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    if (currentUser._id === userToDeleteData.id) {
+      handleDeleteCurrentUser();
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/user/delete/${userToDeleteData.id}`, {
+        method: "DELETE",
+      });
       setShowDeleteModal(false);
       if (response.ok) {
         setUsersData((prevUsers) =>
@@ -133,7 +163,7 @@ function DashUsers() {
                     {new Date(user.createdAt).toLocaleDateString()}
                   </TableCell>
                   <TableCell>
-                    <div className="flex justify-center items-center w-15 h-15">
+                    <div className="flex justify-center items-center w-10 h-10">
                       <img
                         src={user.profilePicture}
                         alt="user-profile-picture"
@@ -199,11 +229,20 @@ function DashUsers() {
           <div className="text-center">
             <FaExclamationCircle className="text-6xl mb-4 mx-auto text-red-500" />
             <h3 className="mb-5 text-lg text-gray-500 dark:text-gray-200">
-              Are you sure you want to delete the user{" "}
-              <span className="font-semibold">
-                «{userToDeleteData?.username}»
-              </span>{" "}
-              ?
+              {userToDeleteData?.id === currentUser._id ? (
+                <>
+                  Are you sure you want to delete <br />
+                  <span className="font-semibold">your own account</span> ?
+                </>
+              ) : (
+                <>
+                  Are you sure you want to delete{" "}
+                  <span className="font-semibold">
+                    «{userToDeleteData?.username}»
+                  </span>{" "}
+                  ?
+                </>
+              )}
             </h3>
             <div className="flex justify-between">
               <Button color="failure" onClick={handleDeleteUser}>

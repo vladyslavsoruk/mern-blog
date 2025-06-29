@@ -72,13 +72,15 @@ function DashPosts() {
         setShowMoreBtn(false);
       }
 
-      setUserPosts((prevPosts) => [...prevPosts, ...data.posts]);
+      setUserPosts((prevPosts) => {
+        const updatedPosts = [...prevPosts, ...data.posts];
 
-      if (data.adminTotalPosts === userPosts.length) {
-        console.log("YEAH BROOO, data.adminTotalPosts === userPosts.length");
+        if (updatedPosts.length === data.adminTotalPosts) {
+          setShowMoreBtn(false);
+        }
 
-        setShowMoreBtn(false);
-      }
+        return updatedPosts;
+      });
     } catch (error) {
       console.error(
         "There was a problem with the fetch operation:",
