@@ -22,14 +22,14 @@ app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 app.use("/api/post", postRouter);
 
-app.get("/", async (req, res) => {
-  try {
-    const users = await User.find({});
-    res.status(200).send(users);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
+// app.get("/", async (req, res) => {
+//   try {
+//     const users = await User.find({});
+//     res.status(200).send(users);
+//   } catch (error) {
+//     res.status(500).send(error);
+//   }
+// });
 
 app.listen(3000, () => {
   console.log("Server is running on port 3000!!!");

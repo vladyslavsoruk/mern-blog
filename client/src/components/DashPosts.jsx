@@ -125,8 +125,12 @@ function DashPosts() {
               <TableHeadCell>Post image</TableHeadCell>
               <TableHeadCell>Post title</TableHeadCell>
               <TableHeadCell>Category</TableHeadCell>
-              <TableHeadCell>Delete</TableHeadCell>
-              <TableHeadCell>Edit</TableHeadCell>
+              <TableHeadCell>
+                <span className="sr-only">Edit</span>
+              </TableHeadCell>
+              <TableHeadCell>
+                <span className="sr-only">Delete</span>
+              </TableHeadCell>
             </TableHead>
             <TableBody className="divide-y">
               {userPosts.map((post) => (
@@ -152,6 +156,13 @@ function DashPosts() {
                   </TableCell>
                   <TableCell>{post.category}</TableCell>
                   <TableCell>
+                    <Link to={`/update-post/${post._id}`}>
+                      <button className="text-blue-500 hover:underline">
+                        Edit
+                      </button>
+                    </Link>
+                  </TableCell>
+                  <TableCell>
                     <button
                       className="text-red-500 hover:underline"
                       onClick={() => {
@@ -164,13 +175,6 @@ function DashPosts() {
                     >
                       Delete
                     </button>
-                  </TableCell>
-                  <TableCell>
-                    <Link to={`/update-post/${post._id}`}>
-                      <button className="text-blue-500 hover:underline">
-                        Edit
-                      </button>
-                    </Link>
                   </TableCell>
                 </TableRow>
               ))}
