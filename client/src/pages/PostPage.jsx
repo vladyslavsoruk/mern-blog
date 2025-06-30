@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useState } from "react";
 import { use } from "react";
 import { Link, useParams } from "react-router-dom";
+import CallToAction from "../components/CallToAction";
 
 function PostPage() {
   const { postSlug } = useParams();
@@ -64,6 +65,9 @@ function PostPage() {
         dangerouslySetInnerHTML={{ __html: post?.content }}
         className="mt-10 p-3 text-justify w-full max-w-2xl mx-auto post-content"
       ></div>
+      <div className="max-w-4xl w-full mx-auto">
+        <CallToAction />
+      </div>
       {loading && (
         <div className="flex w-full items-center gap-2 justify-center self-center">
           <Spinner className="w-10 h-10" />
