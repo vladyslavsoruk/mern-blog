@@ -4,6 +4,7 @@ import { useState } from "react";
 import { use } from "react";
 import { Link, useParams } from "react-router-dom";
 import CallToAction from "../components/CallToAction";
+import CommentSection from "../components/CommentSection";
 
 function PostPage() {
   const { postSlug } = useParams();
@@ -27,9 +28,9 @@ function PostPage() {
 
         const data = await response.json();
 
+        setPost(data.posts[0]);
         console.log(data);
 
-        setPost(data.posts[0]);
         setLoading(false);
       } catch (error) {
         setError(`${error.message}`);
@@ -68,6 +69,7 @@ function PostPage() {
       <div className="max-w-4xl w-full mx-auto">
         <CallToAction />
       </div>
+      <CommentSection postId={post?._id} />
       {loading && (
         <div className="flex w-full items-center gap-2 justify-center self-center">
           <Spinner className="w-10 h-10" />
