@@ -1,4 +1,4 @@
-import { Button, Spinner } from "flowbite-react";
+import { Alert, Button, Spinner } from "flowbite-react";
 import { useEffect } from "react";
 import { useState } from "react";
 import { use } from "react";
@@ -42,7 +42,7 @@ function PostPage() {
   }, [postSlug]);
 
   return (
-    <main className="p-3 flex flex-col items-center max-w-6xl mx-auto min-h-[calc(100vh-62px)]">
+    <main className="relative p-3 flex flex-col items-center max-w-6xl mx-auto min-h-[calc(100vh-62px)]">
       <h1 className="text-3xl mt-10 p-3 font-semibold font-serif max-w-2xl lg:text-4xl">
         {post?.title}
       </h1>
@@ -71,11 +71,12 @@ function PostPage() {
       </div>
       <CommentSection postId={post?._id} />
       {loading && (
-        <div className="flex w-full items-center gap-2 justify-center self-center">
+        <div className="flex items-center gap-2 justify-center absolute top-1/2 left-1/2 -translate-x-1/2">
           <Spinner className="w-10 h-10" />
           <span className="text-xl font-medium">Loading...</span>
         </div>
       )}
+      {error && <Alert color={"failure"}>{error}</Alert>}
     </main>
   );
 }

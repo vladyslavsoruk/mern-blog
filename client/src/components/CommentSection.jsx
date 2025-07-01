@@ -1,14 +1,18 @@
 import { Alert, Button, FooterDivider, Textarea } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Comment from "./Comment";
+import { set } from "mongoose";
 
 function CommentSection({ postId }) {
   const { user: currentUser } = useSelector((state) => state.user);
   const [comment, setComment] = useState("");
   const [commentError, setCommentError] = useState(null);
   const [postComments, setPostComments] = useState(null);
+  const [postTotalComments, setPostTotalComments] = useState(0);
+  const [showMoreBtn, setShowMoreBtn] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchData() {
@@ -16,7 +20,12 @@ function CommentSection({ postId }) {
         const response = await fetch(`/api/comment/get/${postId}`);
         const data = await response.json();
         if (response.ok) {
-          setPostComments(data);
+          if (data.totalPostComments <= 6) {
+            setShowMoreBtn(false);
+          }
+
+          setPostComments(data.comments);
+          setPostTotalComments(data.totalPostComments);
         }
       } catch (error) {
         console.error("Error fetching comments:", error.message);
@@ -50,18 +59,84 @@ function CommentSection({ postId }) {
 
       const data = await response.json();
 
-      console.log("DATA after handle submit", data);
-
       if (response.ok) {
         setComment("");
         setCommentError(null);
         setPostComments((prevComments) => [data, ...prevComments]);
+        setPostTotalComments((prevTotalComments) => prevTotalComments + 1);
       } else {
         setCommentError("Something went wrong while creating the comment");
       }
     } catch (error) {
       setCommentError("Something went wrong while creating the comment");
       console.error("Error creating comment:", error.message);
+    }
+  };
+
+  const handleLike = async (commentId) => {
+    try {
+      if (!currentUser) {
+        navigate("/sign-in");
+        return;
+      }
+
+      const res = await fetch(`/api/comment/like/${commentId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        // Update the postComments state because like was added/removed
+        setPostComments((prevComments) =>
+          prevComments.map((comment) => {
+            if (comment._id === commentId) {
+              return data;
+            }
+            return comment;
+          })
+        );
+      }
+    } catch (error) {
+      console.error("Error liking comment:", error.message);
+    }
+  };
+
+  const handleShowMoreBtn = async () => {
+    const startIndex = postComments.length;
+
+    try {
+      const response = await fetch(
+        `/api/comment/get/${postId}?startIndex=${startIndex}`
+      );
+
+      if (!response.ok) {
+        console.error("Something went wrong while fetching comments");
+        return;
+      }
+
+      const data = await response.json();
+      if (data.comments.length < 6) {
+        setShowMoreBtn(false);
+      }
+
+      setPostComments((prevComments) => {
+        const updatedComments = [...prevComments, ...data.comments];
+
+        if (updatedComments.length === data.totalPostComments) {
+          setShowMoreBtn(false);
+        }
+
+        return updatedComments;
+      });
+    } catch (error) {
+      console.error(
+        "There was a problem with the fetch comments operation:",
+        error.message
+      );
     }
   };
 
@@ -126,20 +201,30 @@ function CommentSection({ postId }) {
       )}
 
       <div className="mt-5 border border-teal-500 rounded-md p-3">
-        <h1 className="text-xl font-semibold">
-          Comments{" "}
+        <h1 className="flex gap-2 text-xl font-semibold">
+          <span>Comments</span>
           <span className="border border-gray-400 rounded-md px-2 py-1 text-sm ml-1">
-            {postComments?.length}
+            {postTotalComments}
           </span>
         </h1>
         <hr className="h-[1px] bg-gray-300 border-0 my-3" />
 
         {postComments && postComments.length > 0 ? (
           postComments.map((comment) => (
-            <Comment key={comment._id} commentData={comment} />
+            <Comment
+              key={comment._id}
+              commentData={comment}
+              onLike={handleLike}
+              isCommentLikedByUser={comment?.likes?.includes(currentUser?._id)}
+            />
           ))
         ) : (
           <p className="text-red-400 mt-2 text-sm">No comments yet...</p>
+        )}
+        {showMoreBtn && (
+          <Button className="mt-3 mx-auto" onClick={handleShowMoreBtn}>
+            Show more...
+          </Button>
         )}
       </div>
     </div>

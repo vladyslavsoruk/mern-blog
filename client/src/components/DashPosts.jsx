@@ -25,27 +25,38 @@ function DashPosts() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [postToDeleteData, setPostToDeleteData] = useState(null);
   const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
+  const [userPostsError, setUserPostsError] = useState(false);
+  const [userPostsLoading, setUserPostsLoading] = useState(false);
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
+        setUserPostsLoading(true);
         const response = await fetch(
           `/api/post/get?authorId=${currentUser._id}`
         );
+
         if (!response.ok) {
-          throw new Error("Something went wrong while fetching posts");
+          setUserPostsError("Something went wrong while fetching posts");
+          setUserPostsLoading(false);
+          return;
         }
+
         const data = await response.json();
 
-        if (data.posts.length === 0) {
-          setNoPosts(true);
-        }
-        if (data.adminTotalPosts <= 9) {
-          setShowMoreBtn(false);
-        }
+        if (response.ok) {
+          if (data.posts.length === 0) {
+            setNoPosts(true);
+          }
+          if (data.adminTotalPosts <= 9) {
+            setShowMoreBtn(false);
+          }
 
-        setUserPosts(data.posts);
+          setUserPosts(data.posts);
+          setUserPostsLoading(false);
+        }
       } catch (error) {
+        setUserPostsLoading(false);
         console.error(
           "There was a problem with the fetch operation:",
           error.message
@@ -65,7 +76,8 @@ function DashPosts() {
         `/api/post/get?authorId=${currentUser._id}&startIndex=${startIndex}`
       );
       if (!response.ok) {
-        throw new Error("Something went wrong while fetching posts");
+        console.error("Something went wrong while fetching posts");
+        return;
       }
       const data = await response.json();
       if (data.posts.length < 9) {
@@ -119,7 +131,7 @@ function DashPosts() {
 
   return (
     <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-gray-400 dark:scrollbar-track-gray-700 dark:scrollbar-thumb-gray-500">
-      {currentUser.isAdmin && userPosts.length > 0 ? (
+      {currentUser.isAdmin && userPosts.length > 0 && (
         <>
           <Table hoverable className="shadow-md">
             <TableHead>
@@ -188,15 +200,24 @@ function DashPosts() {
             </Button>
           )}
         </>
-      ) : (
-        <>
+      )}
+
+      {userPostsLoading && (
+        <div className="text-center">
           <Spinner size="sm" />
           <span className="ml-2">Loading...</span>
-        </>
+        </div>
       )}
+
       {noPosts && (
         <p className="text-center font-semibold mt-3">
           You have no posts yet...
+        </p>
+      )}
+
+      {userPostsError && (
+        <p className="text-center font-semibold mt-3 text-red-500">
+          {userPostsError}
         </p>
       )}
 
@@ -226,6 +247,7 @@ function DashPosts() {
           </div>
         </ModalBody>
       </Modal>
+
       {showDeleteSuccess && (
         <div className="flex gap-2 px-4 py-3 items-center fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white  rounded shadow-lg transition-opacity duration-500 animate-fade-in-out z-50">
           <FaCheckCircle className="text-xl " />
