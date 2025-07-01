@@ -1,7 +1,41 @@
+import { Button, Textarea } from "flowbite-react";
 import moment from "moment";
+import { useState } from "react";
 import { IoMdThumbsUp } from "react-icons/io";
+import { useSelector } from "react-redux";
 
 function Comment({ commentData, onLike, isCommentLikedByUser }) {
+  const { user: currentUser } = useSelector((state) => state.user);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedContent, setEditedContent] = useState(commentData.content);
+
+  const handleSubmitEditing = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(`/api/comment/edit/${commentData._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          content: editedContent,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setIsEditing(false);
+        commentData.content = editedContent;
+      }
+    } catch (error) {
+      console.error(
+        "Something went wrong while editing the comment:",
+        error.message
+      );
+    }
+  };
+
   return (
     <div className="flex gap-3 py-5 border-b border-b-gray-300 text-gray-500 text-sm">
       <div className="flex-shrink-0">
@@ -20,26 +54,91 @@ function Comment({ commentData, onLike, isCommentLikedByUser }) {
             {moment(commentData.createdAt).fromNow()}
           </span>
         </div>
-        <p className="text-gray-500 mb-3">{commentData.content}</p>
 
-        <div className="border-t dark:border-t-gray-700 max-w-fit pt-2">
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              onClick={() => onLike(commentData._id)}
-              className={`transition-colors duration-300 ease-in-out ${
-                isCommentLikedByUser
-                  ? "text-blue-500"
-                  : "text-gray-400 hover:text-blue-500"
-              }`}
+        {isEditing ? (
+          <form
+            className="flex flex-col gap-3 mt-2"
+            onSubmit={handleSubmitEditing}
+          >
+            <div>
+              <Textarea
+                rows={3}
+                minLength={3}
+                maxLength={200}
+                onChange={(e) => setEditedContent(e.target.value)}
+                value={editedContent}
+                className="resize-none"
+              />
+              <p className="text-gray-400 text-xs mt-2">
+                {200 - editedContent.length} characters remaining
+              </p>
+            </div>
+            <div className="flex justify-between">
+              <Button type="submit" color="green">
+                Save
+              </Button>
+              <Button
+                type="button"
+                color="gray"
+                onClick={() => setIsEditing(false)}
+              >
+                Cancel
+              </Button>
+            </div>
+          </form>
+        ) : (
+          <>
+            <p className="text-gray-500 mb-3">{commentData.content}</p>
+            <div
+              className={`${
+                currentUser?._id === commentData.author._id ||
+                currentUser?.isAdmin
+                  ? "border-t dark:border-t-gray-700"
+                  : ""
+              } max-w-fit pt-2`}
             >
-              <IoMdThumbsUp className="text-xl" />
-            </button>
-            <span>
-              {commentData.numberOfLikes > 0 ? commentData.numberOfLikes : ""}
-            </span>
-          </div>
-        </div>
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => onLike(commentData._id)}
+                    className={`transition-colors duration-300 ease-in-out ${
+                      isCommentLikedByUser
+                        ? "text-blue-500"
+                        : "text-gray-400 hover:text-blue-500"
+                    }`}
+                  >
+                    <IoMdThumbsUp className="text-xl" />
+                  </button>
+                  <span>
+                    {commentData.numberOfLikes > 0
+                      ? commentData.numberOfLikes
+                      : ""}
+                  </span>
+                </div>
+                {currentUser &&
+                  (currentUser._id === commentData.author._id ||
+                    currentUser.isAdmin) && (
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setIsEditing(true)}
+                        className="text-blue-400 transition-colors duration-300 ease-in-out hover:text-blue-600 hover:underline"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        className="text-red-400 transition-colors duration-300 ease-in-out hover:text-red-600 hover:underline"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  )}
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
