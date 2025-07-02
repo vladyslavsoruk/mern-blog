@@ -21,6 +21,7 @@ import {
   deleteStart,
   deleteSuccess,
 } from "../redux/user/userSlice";
+import { useNavigate } from "react-router-dom";
 
 function DashUsers() {
   const { user: currentUser } = useSelector((state) => state.user);
@@ -31,8 +32,14 @@ function DashUsers() {
   const [userToDeleteData, setUserToDeleteData] = useState(null);
   const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
+    if (!currentUser.isAdmin) {
+      navigate("/dashboard?tab=profile");
+      return;
+    }
+
     const fetchPosts = async () => {
       try {
         const response = await fetch(`/api/user/get`);

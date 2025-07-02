@@ -6,11 +6,13 @@ import {
   likeComment,
   editComment,
   deleteComment,
+  getAllComments,
 } from "../controllers/comment.controller.js";
 
 const commentRouter = express.Router();
 commentRouter.post("/create", verifyToken, createComment);
 commentRouter.get("/get/:postId", getPostComments);
+commentRouter.get("/get", verifyToken, getAllComments);
 commentRouter.put("/like/:commentId", verifyToken, likeComment);
 commentRouter.put("/edit/:commentId", verifyToken, editComment);
 commentRouter.delete("/:commentId", verifyToken, deleteComment);

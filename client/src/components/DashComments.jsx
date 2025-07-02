@@ -17,16 +17,16 @@ import { FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
-function DashPosts() {
+function DashComments() {
   const { user: currentUser } = useSelector((state) => state.user);
-  const [userPosts, setUserPosts] = useState([]);
-  const [noPosts, setNoPosts] = useState(false);
+  const [userComments, setUserComments] = useState([]);
+  const [noComments, setNoComments] = useState(false);
   const [showMoreBtn, setShowMoreBtn] = useState(true);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [postToDeleteData, setPostToDeleteData] = useState(null);
+  const [commentToDeleteId, setCommentToDeleteId] = useState(null);
   const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
-  const [userPostsError, setUserPostsError] = useState(false);
-  const [userPostsLoading, setUserPostsLoading] = useState(false);
+  const [userCommentsError, setUserCommentsError] = useState(false);
+  const [userCommentsLoading, setUserCommentsLoading] = useState(false);
 
   useEffect(() => {
     if (!currentUser.isAdmin) {
@@ -34,69 +34,63 @@ function DashPosts() {
       return;
     }
 
-    const fetchPosts = async () => {
+    const fetchComments = async () => {
       try {
-        setUserPostsLoading(true);
-        const response = await fetch(
-          `/api/post/get?authorId=${currentUser._id}`
-        );
+        setUserCommentsLoading(true);
+        const response = await fetch(`/api/comment/get`);
 
         if (!response.ok) {
-          setUserPostsError("Something went wrong while fetching posts");
-          setUserPostsLoading(false);
+          setUserCommentsError("Something went wrong while fetching comments");
+          setUserCommentsLoading(false);
           return;
         }
 
         const data = await response.json();
 
         if (response.ok) {
-          if (data.posts.length === 0) {
-            setNoPosts(true);
+          if (data.comments.length === 0) {
+            setNoComments(true);
           }
-          if (data.adminTotalPosts <= 9) {
+          if (data.totalComments <= 9) {
             setShowMoreBtn(false);
           }
 
-          setUserPosts(data.posts);
-          setUserPostsLoading(false);
+          setUserComments(data.comments);
+          setUserCommentsLoading(false);
         }
       } catch (error) {
-        setUserPostsLoading(false);
+        setUserCommentsLoading(false);
         console.error(
           "There was a problem with the fetch operation:",
           error.message
         );
       }
     };
-    if (currentUser.isAdmin) {
-      // Fetch 9 first posts if the user is an admin
-      fetchPosts();
-    }
+    // Fetch 9 first posts if the user is an admin
+    fetchComments();
   }, [currentUser._id]);
 
   const handleShowMoreBtn = async () => {
-    const startIndex = userPosts.length;
+    const startIndex = userComments.length;
     try {
-      const response = await fetch(
-        `/api/post/get?authorId=${currentUser._id}&startIndex=${startIndex}`
-      );
+      const response = await fetch(`/api/comment/get?startIndex=${startIndex}`);
       if (!response.ok) {
-        console.error("Something went wrong while fetching posts");
+        console.error("Something went wrong while fetching comments");
         return;
       }
       const data = await response.json();
-      if (data.posts.length < 9) {
+      if (data.comments.length < 9) {
         setShowMoreBtn(false);
       }
 
-      setUserPosts((prevPosts) => {
-        const updatedPosts = [...prevPosts, ...data.posts];
+      setUserComments((prevComments) => {
+        const updatedComments = [...prevComments, ...data.comments];
 
-        if (updatedPosts.length === data.adminTotalPosts) {
+        if (updatedComments.length === data.totalComments) {
           setShowMoreBtn(false);
         }
 
-        return updatedPosts;
+        return updatedComments;
       });
     } catch (error) {
       console.error(
@@ -106,18 +100,15 @@ function DashPosts() {
     }
   };
 
-  const handleDeletePost = async () => {
+  const handleDeleteComment = async () => {
     try {
-      const response = await fetch(
-        `/api/post/delete/${postToDeleteData.id}/${currentUser._id}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const response = await fetch(`/api/comment/${commentToDeleteId}`, {
+        method: "DELETE",
+      });
       setShowDeleteModal(false);
       if (response.ok) {
-        setUserPosts((prevPosts) =>
-          prevPosts.filter((post) => post._id !== postToDeleteData.id)
+        setUserComments((prevComments) =>
+          prevComments.filter((c) => c._id !== commentToDeleteId)
         );
 
         setShowDeleteSuccess(true);
@@ -128,7 +119,7 @@ function DashPosts() {
       }
     } catch (error) {
       console.error(
-        "Something went wrong while deleting the post:",
+        "Something went wrong while deleting the comment:",
         error.message
       );
     }
@@ -136,60 +127,46 @@ function DashPosts() {
 
   return (
     <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-gray-400 dark:scrollbar-track-gray-700 dark:scrollbar-thumb-gray-500">
-      {currentUser.isAdmin && userPosts.length > 0 && (
+      {currentUser.isAdmin && userComments.length > 0 && (
         <>
           <Table hoverable className="shadow-md">
             <TableHead>
               <TableHeadCell>Date updated</TableHeadCell>
-              <TableHeadCell>Post image</TableHeadCell>
-              <TableHeadCell>Post title</TableHeadCell>
-              <TableHeadCell>Category</TableHeadCell>
-              <TableHeadCell>
-                <span className="sr-only">Edit</span>
-              </TableHeadCell>
+              <TableHeadCell>Comment content</TableHeadCell>
+              <TableHeadCell>Number of likes</TableHeadCell>
+              <TableHeadCell>Post</TableHeadCell>
+              <TableHeadCell>Author</TableHeadCell>
               <TableHeadCell>
                 <span className="sr-only">Delete</span>
               </TableHeadCell>
             </TableHead>
+
             <TableBody className="divide-y">
-              {userPosts.map((post) => (
-                <TableRow key={post._id}>
+              {userComments.map((comment) => (
+                <TableRow key={comment._id}>
                   <TableCell>
-                    {new Date(post.updatedAt).toLocaleDateString()}
+                    {new Date(comment.updatedAt).toLocaleDateString()}
                   </TableCell>
                   <TableCell>
-                    <Link to={`/post/${post.slug}`}>
-                      <img
-                        src={post.image}
-                        alt={post.title}
-                        className="w-20 h-12 object-contain bg-gray-500 hover:opacity-80 rounded"
-                      />
-                    </Link>
+                    <span className="font-medium text-gray-900 dark:text-white">
+                      {comment.content}
+                    </span>
                   </TableCell>
+                  <TableCell>{comment.numberOfLikes}</TableCell>
                   <TableCell>
-                    <Link to={`/post/${post.slug}`}>
+                    <Link to={`/post/${comment.post.slug}`}>
                       <span className="hover:underline font-medium text-gray-900 dark:text-white">
-                        {post.title}
+                        {comment.post.title}
                       </span>
                     </Link>
                   </TableCell>
-                  <TableCell>{post.category}</TableCell>
-                  <TableCell>
-                    <Link to={`/update-post/${post._id}`}>
-                      <button className="text-blue-500 hover:underline">
-                        Edit
-                      </button>
-                    </Link>
-                  </TableCell>
+                  <TableCell>{comment.author.username}</TableCell>
                   <TableCell>
                     <button
                       className="text-red-500 hover:underline"
                       onClick={() => {
                         setShowDeleteModal(true);
-                        setPostToDeleteData({
-                          id: post._id,
-                          title: post.title,
-                        });
+                        setCommentToDeleteId(comment._id);
                       }}
                     >
                       Delete
@@ -207,22 +184,22 @@ function DashPosts() {
         </>
       )}
 
-      {userPostsLoading && (
+      {userCommentsLoading && (
         <div className="text-center">
           <Spinner size="sm" />
           <span className="ml-2">Loading...</span>
         </div>
       )}
 
-      {noPosts && (
+      {noComments && (
         <p className="text-center font-semibold mt-3">
-          You have no posts yet...
+          There are no comments yet...
         </p>
       )}
 
-      {userPostsError && (
+      {userCommentsError && (
         <p className="text-center font-semibold mt-3 text-red-500">
-          {userPostsError}
+          {userCommentsError}
         </p>
       )}
 
@@ -230,19 +207,17 @@ function DashPosts() {
         show={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         popup
-        size={"md"}
+        size={"lg"}
       >
         <ModalHeader />
         <ModalBody>
           <div className="text-center">
             <FaExclamationCircle className="text-6xl mb-4 mx-auto text-red-500" />
             <h3 className="mb-5 text-lg text-gray-500 dark:text-gray-200">
-              Are you sure you want to delete the post{" "}
-              <span className="font-semibold">«{postToDeleteData?.title}»</span>{" "}
-              ?
+              Are you sure you want to delete this comment ?
             </h3>
             <div className="flex justify-between">
-              <Button color="failure" onClick={handleDeletePost}>
+              <Button color="failure" onClick={handleDeleteComment}>
                 Yes, I'm sure
               </Button>
               <Button color="light" onClick={() => setShowDeleteModal(false)}>
@@ -252,15 +227,14 @@ function DashPosts() {
           </div>
         </ModalBody>
       </Modal>
-
       {showDeleteSuccess && (
         <div className="flex gap-2 px-4 py-3 items-center fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white  rounded shadow-lg transition-opacity duration-500 animate-fade-in-out z-50">
           <FaCheckCircle className="text-xl " />
-          <span>Post was successfully deleted!</span>
+          <span>Comment was successfully deleted!</span>
         </div>
       )}
     </div>
   );
 }
 
-export default DashPosts;
+export default DashComments;
