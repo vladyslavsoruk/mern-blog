@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import Comment from "./Comment";
 import { set } from "mongoose";
+import { FaCheckCircle } from "react-icons/fa";
 
 function CommentSection({ postId }) {
   const { user: currentUser } = useSelector((state) => state.user);
@@ -12,6 +13,9 @@ function CommentSection({ postId }) {
   const [postComments, setPostComments] = useState(null);
   const [postTotalComments, setPostTotalComments] = useState(0);
   const [showMoreBtn, setShowMoreBtn] = useState(true);
+  const [showDeleteCommentSuccess, setShowDeleteCommentSuccess] =
+    useState(false);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -140,6 +144,29 @@ function CommentSection({ postId }) {
     }
   };
 
+  const handleDeleteComment = (commentId) => {
+    setPostComments((prev) => prev.filter((c) => c._id !== commentId));
+    setPostTotalComments((prev) => prev - 1);
+    setShowDeleteCommentSuccess(true);
+    setTimeout(() => {
+      setShowDeleteCommentSuccess(false);
+    }, 3000);
+  };
+
+  const handleEditComment = (commentId, newContent) => {
+    setPostComments((prev) =>
+      prev.map((c) => {
+        if (c._id === commentId) {
+          return {
+            ...c,
+            content: newContent,
+          };
+        }
+        return c;
+      })
+    );
+  };
+
   return (
     <div className="max-w-2xl mx-auto w-full p-3">
       {currentUser ? (
@@ -216,15 +243,25 @@ function CommentSection({ postId }) {
               commentData={comment}
               onLike={handleLike}
               isCommentLikedByUser={comment?.likes?.includes(currentUser?._id)}
+              handleDeleteComment={handleDeleteComment}
+              handleEditComment={handleEditComment}
             />
           ))
         ) : (
           <p className="text-red-400 mt-2 text-sm">No comments yet...</p>
         )}
+
         {showMoreBtn && (
           <Button className="mt-3 mx-auto" onClick={handleShowMoreBtn}>
             Show more...
           </Button>
+        )}
+
+        {showDeleteCommentSuccess && (
+          <div className="flex gap-2 px-4 py-3 items-center fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white  rounded shadow-lg transition-opacity duration-500 animate-fade-in-out z-50">
+            <FaCheckCircle className="text-xl " />
+            <span>Comment was successfully deleted!</span>
+          </div>
         )}
       </div>
     </div>

@@ -1,3 +1,4 @@
+import { errorHandler } from "../../utils/error.js";
 import Comment from "../models/comment.model.js";
 import Post from "../models/post.model.js";
 
@@ -111,6 +112,30 @@ export const editComment = async (req, res, next) => {
       "username profilePicture"
     );
     res.status(200).json(comment);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteComment = async (req, res, next) => {
+  try {
+    const existingComment = await Comment.findById(req.params.commentId);
+
+    if (!existingComment) {
+      return next(errorHandler(404, "Comment not found"));
+    }
+
+    if (
+      existingComment.author.toString() !== req.user.id &&
+      !req.user.isAdmin
+    ) {
+      return next(
+        errorHandler(403, "You are not allowed to delete this comment!")
+      );
+    }
+
+    await Comment.findByIdAndDelete(req.params.commentId);
+    res.status(200).json("The comment was successfully deleted");
   } catch (error) {
     next(error);
   }

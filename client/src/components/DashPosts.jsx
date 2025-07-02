@@ -247,13 +247,6 @@ function DashPosts() {
           </div>
         </ModalBody>
       </Modal>
-
-      {showDeleteSuccess && (
-        <div className="flex gap-2 px-4 py-3 items-center fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white  rounded shadow-lg transition-opacity duration-500 animate-fade-in-out z-50">
-          <FaCheckCircle className="text-xl " />
-          <span>Post was successfully deleted!</span>
-        </div>
-      )}
     </div>
   );
 }
