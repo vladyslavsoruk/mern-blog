@@ -20,19 +20,21 @@ function CommentSection({ postId }) {
 
   useEffect(() => {
     async function fetchData() {
-      try {
-        const response = await fetch(`/api/comment/get/${postId}`);
-        const data = await response.json();
-        if (response.ok) {
-          if (data.totalPostComments <= 6) {
-            setShowMoreBtn(false);
-          }
+      if (postId) {
+        try {
+          const response = await fetch(`/api/comment/get/${postId}`);
+          const data = await response.json();
+          if (response.ok) {
+            if (data.totalPostComments <= 6) {
+              setShowMoreBtn(false);
+            }
 
-          setPostComments(data.comments);
-          setPostTotalComments(data.totalPostComments);
+            setPostComments(data.comments);
+            setPostTotalComments(data.totalPostComments);
+          }
+        } catch (error) {
+          console.error("Error fetching comments:", error.message);
         }
-      } catch (error) {
-        console.error("Error fetching comments:", error.message);
       }
     }
     fetchData();

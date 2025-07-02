@@ -5,10 +5,12 @@ import { use } from "react";
 import { Link, useParams } from "react-router-dom";
 import CallToAction from "../components/CallToAction";
 import CommentSection from "../components/CommentSection";
+import PostCard from "../components/PostCard";
 
 function PostPage() {
   const { postSlug } = useParams();
   const [post, setPost] = useState(null);
+  const [recentPosts, setRecentPosts] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -20,6 +22,13 @@ function PostPage() {
 
         const response = await fetch(`/api/post/get?slug=${postSlug}`);
 
+        const rPosts = await fetch("/api/post/get?limit=3");
+        const rPostsData = await rPosts.json();
+
+        if (!rPosts.ok) {
+          console.error("Something went wrong while fetching recent posts");
+        }
+
         if (!response.ok) {
           setError("Something went wrong while fetching the post");
           setLoading(false);
@@ -29,7 +38,16 @@ function PostPage() {
         const data = await response.json();
 
         setPost(data.posts[0]);
-        console.log(data);
+
+        if (rPostsData.posts.some((p) => p._id === data.posts[0]._id)) {
+          console.log("data.posts.includes(post)!!!");
+          const r = await fetch("/api/post/get?limit=4");
+          const d = await r.json();
+          setRecentPosts(d.posts.filter((p) => p._id !== data.posts[0]._id));
+          console.log(d.posts.filter((p) => p._id !== data.posts[0]._id));
+        } else {
+          setRecentPosts(rPostsData.posts);
+        }
 
         setLoading(false);
       } catch (error) {
@@ -64,12 +82,24 @@ function PostPage() {
       </div>
       <div
         dangerouslySetInnerHTML={{ __html: post?.content }}
-        className="mt-10 p-3 text-justify w-full max-w-2xl mx-auto post-content"
+        className="mt-10 p-3 text-jus   tify w-full max-w-2xl mx-auto post-content"
       ></div>
       <div className="max-w-4xl w-full mx-auto">
         <CallToAction />
       </div>
+
+      {/* COMMENTS SECTION*/}
       <CommentSection postId={post?._id} />
+
+      {/* RECENT POSTS SECTION */}
+      <div className="flex flex-col justify-center items-center mb-5">
+        <h1 className="text-xl mt-5 font-semibold mb-6">Recent articles</h1>
+        <div className="flex flex-wrap justify-center gap-6">
+          {recentPosts &&
+            recentPosts.map((post) => <PostCard key={post._id} post={post} />)}
+        </div>
+      </div>
+
       {loading && (
         <div className="flex items-center gap-2 justify-center absolute top-1/2 left-1/2 -translate-x-1/2">
           <Spinner className="w-10 h-10" />
