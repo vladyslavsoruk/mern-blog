@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { FaUsers, FaComments } from "react-icons/fa";
 
 import { HiArrowSmRight, HiDocumentText, HiUser } from "react-icons/hi";
+import { MdDashboard } from "react-icons/md";
 import { Link, useLocation } from "react-router-dom";
 import { signOutSuccess } from "../redux/user/userSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -43,6 +44,15 @@ function DashSidebar() {
     <Sidebar className="h-full w-full">
       <SidebarItems>
         <SidebarItemGroup className="flex flex-col gap-1">
+          {currentUser?.isAdmin && (
+            <SidebarItem
+              active={tab === "dashboard" || !tab}
+              icon={MdDashboard}
+              as="div"
+            >
+              <Link to="/dashboard?tab=dashboard">Dashboard</Link>
+            </SidebarItem>
+          )}
           <SidebarItem
             active={tab === "profile"}
             icon={HiUser}
