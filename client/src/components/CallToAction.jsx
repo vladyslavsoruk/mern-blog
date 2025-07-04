@@ -5,7 +5,7 @@ function CallToAction() {
     <div className="flex flex-col sm:flex-row p-3 border border-teal-500 justify-center items-center rounded-tl-3xl rounded-br-3xl text-center">
       <div className="flex-1 w-full sm:w-auto">
         <h2 className="text-2xl mb-2">Want to learn more about NestJS?</h2>
-        <p className="text-gray-500 mb-2">
+        <p className="text-gray-500 dark:text-gray-400 mb-2">
           Checkout these resources with 20+ hours of practice with Nest
         </p>
         <Button className="rounded-tl-xl rounded-bl-none mx-auto">

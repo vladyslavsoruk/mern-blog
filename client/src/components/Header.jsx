@@ -14,6 +14,7 @@ import {
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AiOutlineSearch } from "react-icons/ai";
 import { FaMoon } from "react-icons/fa";
+import { MdLightMode } from "react-icons/md";
 import { useSelector, useDispatch } from "react-redux";
 import { toggleTheme } from "../redux/theme/themeSlice";
 import { signOutSuccess } from "../redux/user/userSlice";
@@ -25,9 +26,11 @@ function Header() {
   const [smallScreenSearch, setSmallScreenSearch] = useState(false);
 
   const path = useLocation().pathname;
+
   const location = useLocation();
 
   const { user: currentUser } = useSelector((state) => state.user);
+  const { theme } = useSelector((state) => state.theme);
 
   const dispatch = useDispatch();
 
@@ -106,6 +109,8 @@ function Header() {
             className="w-40 lg:hidden"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            // if focus on TextInput is lost, set smallScreenSearch to false
+            onBlur={() => setSmallScreenSearch(false)}
           />
         )}
       </form>
@@ -121,13 +126,14 @@ function Header() {
         </Button>
       )}
 
-      <div className="flex gap-4 md:order-2 items-center">
+      <div className="flex gap-6 md:order-2 items-center">
         <Button
-          className="px-4 py-1 hidden sm:inline cursor-pointer"
+          className="p-1 hidden sm:inline cursor-pointer"
+          pill
           color="light"
           onClick={() => dispatch(toggleTheme())}
         >
-          <FaMoon />
+          {theme === "light" ? <MdLightMode className="text-lg" /> : <FaMoon />}
         </Button>
 
         {currentUser ? (
@@ -169,8 +175,8 @@ function Header() {
       </div>
 
       <NavbarCollapse>
-        <NavbarLink active={path === "/home"} as="div">
-          <Link to="/home">Home</Link>
+        <NavbarLink active={path === "/"} as="div">
+          <Link to="/">Home</Link>
         </NavbarLink>
         <NavbarLink active={path === "/about"} as="div">
           <Link to="/about">About</Link>
