@@ -31,6 +31,9 @@ function DashUsers() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [userToDeleteData, setUserToDeleteData] = useState(null);
   const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
+  const [usersError, setUsersError] = useState(false);
+  const [usersLoading, setUsersLoading] = useState(false);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -42,10 +45,14 @@ function DashUsers() {
 
     const fetchPosts = async () => {
       try {
+        setUsersLoading(true);
         const response = await fetch(`/api/user/get`);
         if (!response.ok) {
-          throw new Error("Something went wrong while fetching users");
+          setUsersLoading(false);
+          setUsersError("Something went wrong while fetching users");
+          return;
         }
+
         const data = await response.json();
 
         if (data.users.length === 0) {
@@ -57,10 +64,11 @@ function DashUsers() {
         }
 
         setUsersData(data.users);
+        setUsersLoading(false);
       } catch (error) {
-        console.error(
-          "There was a problem with the fetch operation:",
-          error.message
+        setUsersLoading(false);
+        setUsersError(
+          `There was a problem with the fetch operation: ${error.message}`
         );
       }
     };
@@ -73,10 +81,15 @@ function DashUsers() {
   const handleShowMoreBtn = async () => {
     const startIndex = usersData.length;
     try {
+      setUsersLoading(true);
       const response = await fetch(`/api/user/get?startIndex=${startIndex}`);
+
       if (!response.ok) {
-        throw new Error("Something went wrong while fetching users");
+        setUsersLoading(false);
+        setUsersError("Something went wrong while fetching users");
+        return;
       }
+
       const data = await response.json();
       if (data.users.length < 9) {
         setShowMoreBtn(false);
@@ -91,10 +104,12 @@ function DashUsers() {
 
         return updatedUsers;
       });
+
+      setUsersLoading(false);
     } catch (error) {
-      console.error(
-        "There was a problem with the fetch operation:",
-        error.message
+      setUsersLoading(false);
+      setUsersError(
+        `There was a problem with the fetch operation: ${error.message}`
       );
     }
   };
@@ -149,7 +164,7 @@ function DashUsers() {
 
   return (
     <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-gray-400 dark:scrollbar-track-gray-700 dark:scrollbar-thumb-gray-500">
-      {currentUser.isAdmin && usersData.length > 0 ? (
+      {currentUser.isAdmin && usersData.length > 0 && (
         <>
           <Table hoverable className="shadow-md">
             <TableHead>
@@ -209,20 +224,32 @@ function DashUsers() {
               ))}
             </TableBody>
           </Table>
-          {showMoreBtn && (
-            <Button className="mt-3 mx-auto" onClick={handleShowMoreBtn}>
-              Show more...
-            </Button>
-          )}
-        </>
-      ) : (
-        <>
-          <Spinner size="sm" />
-          <span className="ml-2">Loading...</span>
         </>
       )}
+
+      {!usersLoading && showMoreBtn && (
+        <Button className="mt-3 mx-auto" onClick={handleShowMoreBtn}>
+          Show more...
+        </Button>
+      )}
+
+      {usersLoading && (
+        <div className="text-center">
+          <Spinner size="sm" />
+          <span className="ml-2">Loading...</span>
+        </div>
+      )}
+
+      {usersError && (
+        <p className="text-center font-semibold mt-3 text-red-500">
+          {usersError}
+        </p>
+      )}
+
       {noUsers && (
-        <p className="text-center font-semibold mt-3">No users yet...</p>
+        <p className="text-center font-semibold mt-3 text-red-500">
+          No users yet...
+        </p>
       )}
 
       <Modal

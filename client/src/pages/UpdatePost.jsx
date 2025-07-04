@@ -28,7 +28,6 @@ function UpdatePost() {
   const [postUpdateError, setPostUpdateError] = useState(null);
   const [postSLug, setPostSlug] = useState(null);
   const [postDataLoading, setPostDataLoading] = useState(null);
-  const initialContentRef = useRef("");
   const { postId } = useParams();
 
   useEffect(() => {
@@ -74,7 +73,10 @@ function UpdatePost() {
   };
 
   const handleImageUpload = async () => {
-    if (!imageFile) return;
+    if (!imageFile) {
+      setImageFileUploadError("No image for post selected");
+      return;
+    }
 
     setImageFileLoading(true);
     setImageFileUploadError(null);
@@ -137,6 +139,13 @@ function UpdatePost() {
       setPostDataLoading(false);
       return;
     }
+
+    // Delete image if no new image is uploaded
+    if (!imageFileUrl && postData?.image) {
+      delete postData.image;
+    }
+
+    console.log("POSTDATA:", postData);
 
     try {
       const response = await fetch(
@@ -211,7 +220,7 @@ function UpdatePost() {
               onChange={handleImageChange}
               ref={filePickerReference}
             />
-            {imageFile && (
+            {!imageFileUploadSuccess && (
               <Button
                 type="button"
                 onClick={handleImageUpload}
@@ -230,7 +239,10 @@ function UpdatePost() {
           </div>
 
           {imageFileUrl && (
-            <Alert color="info" className="mt-4 ">
+            <Alert
+              color="info"
+              className="mt-4 overflow-scroll scrollbar scrollbar-track-slate-100 scrollbar-thumb-gray-400 dark:scrollbar-track-gray-700 dark:scrollbar-thumb-gray-500"
+            >
               <div className="flex gap-4 justify-between items-center">
                 <span className="font-medium">
                   {imageFileUploadSuccess
@@ -239,24 +251,25 @@ function UpdatePost() {
                 </span>
                 <img src={imageFileUrl} alt="postImage" className="h-48" />
 
-                {!imageFileUploadSuccess && (
-                  <Button
-                    color={"red"}
-                    className="text-sm"
-                    onClick={() => {
-                      setImageFile(null);
-                      setImageFileUrl(null);
-                      filePickerReference.current.value = null; // Clear the file input
-                      setImageFileUploadSuccess(null);
-                      setImageFileUploadError(null);
-                    }}
-                  >
-                    <div className="flex items-center gap-2">
-                      <RxCross2 />
-                      <span>Remove selected image</span>
-                    </div>
-                  </Button>
-                )}
+                <Button
+                  color={"red"}
+                  className="text-sm"
+                  onClick={() => {
+                    setImageFile(null);
+                    setImageFileUrl(null);
+                    filePickerReference.current.value = null; // Clear the file input
+                    setImageFileUploadSuccess(null);
+                    setImageFileUploadError(null);
+                  }}
+                >
+                  <div className="flex items-center gap-2 min-w-[150px]">
+                    <RxCross2 className="text-2xl" />
+                    <span>
+                      Remove {imageFileUploadSuccess ? "uploaded" : "selected"}{" "}
+                      image
+                    </span>
+                  </div>
+                </Button>
               </div>
             </Alert>
           )}

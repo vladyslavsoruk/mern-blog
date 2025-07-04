@@ -37,11 +37,8 @@ export const createPost = async (req, res, next) => {
 
 export const getPosts = async (req, res, next) => {
   try {
-    const startIndex = parseInt(req.query.startIndex) || 0;
-    const limit = parseInt(req.query.limit) || 9;
-    const sortDirection = req.query.order === "asc" ? 1 : -1;
-
-    const posts = await Post.find({
+    // 1) Собираем общий фильтр из query-параметров
+    const filter = {
       ...(req.query.authorId && { author: req.query.authorId }),
       ...(req.query.category && { category: req.query.category }),
       ...(req.query.slug && { slug: req.query.slug }),
@@ -52,37 +49,118 @@ export const getPosts = async (req, res, next) => {
           { content: { $regex: req.query.searchTerm, $options: "i" } },
         ],
       }),
-    })
-      .sort({ updatedAt: sortDirection })
-      .skip(startIndex)
-      .limit(limit)
-      .populate("author", "username email");
+    };
 
-    const totalPosts = await Post.countDocuments();
+    const startIndex = parseInt(req.query.startIndex) || 0;
+    const limit = parseInt(req.query.limit) || 9;
+    const sortDirection = req.query.sort === "asc" ? 1 : -1;
 
-    const adminTotalPosts = await Post.countDocuments({
-      author: req.query.authorId,
-    });
-
+    // 2) Параллельно делаем:
+    //    - запрос на посты с пагинацией
+    //    - подсчёт к-ства постов которые подходят под фильтр
+    //    - подсчёт постов написанных определенным админом (если есть authorId)
+    //    - подсчёт постов за последний месяц
     const now = new Date();
-
     const oneMonthAgo = new Date(
       now.getFullYear(),
       now.getMonth() - 1,
       now.getDate()
     );
 
-    const lastMonthPosts = await Post.countDocuments({
-      createdAt: { $gte: oneMonthAgo },
-    });
+    const [posts, totalPostsAfterFilters, adminTotalPosts, lastMonthPosts] =
+      await Promise.all([
+        Post.find(filter)
+          .sort({ updatedAt: sortDirection })
+          .skip(startIndex)
+          .limit(limit)
+          .populate("author", "username email"),
 
-    res
-      .status(200)
-      .json({ posts, adminTotalPosts, totalPosts, lastMonthPosts });
+        Post.countDocuments(filter),
+
+        // adminTotalPosts считается только если передан authorId
+        req.query.authorId
+          ? Post.countDocuments({ author: req.query.authorId })
+          : Promise.resolve(0),
+
+        Post.countDocuments({ createdAt: { $gte: oneMonthAgo } }),
+      ]);
+
+    // 3) Общий подсчёт всех существующих постов
+    const totalPosts = await Post.countDocuments();
+
+    return res.status(200).json({
+      posts,
+      totalPosts,
+      totalPostsAfterFilters,
+      adminTotalPosts,
+      lastMonthPosts,
+    });
   } catch (error) {
     next(error);
   }
 };
+
+// export const getPosts = async (req, res, next) => {
+//   try {
+//     const startIndex = parseInt(req.query.startIndex) || 0;
+//     const limit = parseInt(req.query.limit) || 9;
+//     const sortDirection = req.query.sort === "asc" ? 1 : -1;
+
+//     const posts = await Post.find({
+//       ...(req.query.authorId && { author: req.query.authorId }),
+//       ...(req.query.category && { category: req.query.category }),
+//       ...(req.query.slug && { slug: req.query.slug }),
+//       ...(req.query.postId && { _id: req.query.postId }),
+//       ...(req.query.searchTerm && {
+//         $or: [
+//           { title: { $regex: req.query.searchTerm, $options: "i" } },
+//           { content: { $regex: req.query.searchTerm, $options: "i" } },
+//         ],
+//       }),
+//     })
+//       .sort({ updatedAt: sortDirection })
+//       .skip(startIndex)
+//       .limit(limit)
+//       .populate("author", "username email");
+
+//     const totalPosts = await Post.countDocuments();
+
+//     const totalPostsAfterFilters = await Post.countDocuments({
+//       ...(req.query.authorId && { author: req.query.authorId }),
+//       ...(req.query.category && { category: req.query.category }),
+//       ...(req.query.slug && { slug: req.query.slug }),
+//       ...(req.query.postId && { _id: req.query.postId }),
+//       ...(req.query.searchTerm && {
+//         $or: [
+//           { title: { $regex: req.query.searchTerm, $options: "i" } },
+//           { content: { $regex: req.query.searchTerm, $options: "i" } },
+//         ],
+//       }),
+//     });
+
+//     const adminTotalPosts = await Post.countDocuments({
+//       author: req.query.authorId,
+//     });
+
+//     const now = new Date();
+
+//     const oneMonthAgo = new Date(
+//       now.getFullYear(),
+//       now.getMonth() - 1,
+//       now.getDate()
+//     );
+
+//     const lastMonthPosts = await Post.countDocuments({
+//       createdAt: { $gte: oneMonthAgo },
+//     });
+
+//     res
+//       .status(200)
+//       .json({ posts, adminTotalPosts, totalPosts, lastMonthPosts });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
 export const deletePost = async (req, res, next) => {
   if (!req.user.isAdmin || req.user.id !== req.params.userId) {
@@ -115,7 +193,9 @@ export const updatePost = async (req, res, next) => {
         $set: {
           title: req.body.title,
           content: req.body.content,
-          image: req.body.image,
+          image: req.body.image
+            ? req.body.image
+            : "https://contenthub-static.grammarly.com/blog/wp-content/uploads/2017/11/how-to-write-a-blog-post.jpeg",
           category: req.body.category,
           slug,
         },

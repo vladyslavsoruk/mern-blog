@@ -12,6 +12,7 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { useRef } from "react";
 import { Link } from "react-router-dom";
+import { set } from "mongoose";
 
 function CreatePost() {
   const [contentValue, setContentValue] = useState("");
@@ -48,7 +49,10 @@ function CreatePost() {
   };
 
   const handleImageUpload = async () => {
-    if (!imageFile) return;
+    if (!imageFile) {
+      setImageFileUploadError("No image for post selected");
+      return;
+    }
 
     setImageFileLoading(true);
     setImageFileUploadError(null);
@@ -181,7 +185,7 @@ function CreatePost() {
               onChange={handleImageChange}
               ref={filePickerReference}
             />
-            {imageFile && (
+            {!imageFileUploadSuccess && (
               <Button
                 type="button"
                 onClick={handleImageUpload}
@@ -200,7 +204,10 @@ function CreatePost() {
           </div>
 
           {imageFileUrl && (
-            <Alert color="info" className="mt-4 ">
+            <Alert
+              color="info"
+              className="mt-4 overflow-scroll scrollbar scrollbar-track-slate-100 scrollbar-thumb-gray-400 dark:scrollbar-track-gray-700 dark:scrollbar-thumb-gray-500"
+            >
               <div className="flex gap-4 justify-between items-center">
                 <span className="font-medium">
                   {imageFileUploadSuccess
@@ -221,8 +228,8 @@ function CreatePost() {
                       setImageFileUploadError(null);
                     }}
                   >
-                    <div className="flex items-center gap-2">
-                      <RxCross2 />
+                    <div className="flex items-center gap-2 min-w-[150px]">
+                      <RxCross2 className="text-2xl" />
                       <span>Remove selected image</span>
                     </div>
                   </Button>

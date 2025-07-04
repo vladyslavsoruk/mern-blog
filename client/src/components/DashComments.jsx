@@ -73,11 +73,15 @@ function DashComments() {
   const handleShowMoreBtn = async () => {
     const startIndex = userComments.length;
     try {
+      setUserCommentsLoading(true);
       const response = await fetch(`/api/comment/get?startIndex=${startIndex}`);
+
       if (!response.ok) {
-        console.error("Something went wrong while fetching comments");
+        setUserCommentsLoading(false);
+        setUserCommentsError("Something went wrong while fetching comments");
         return;
       }
+
       const data = await response.json();
       if (data.comments.length < 9) {
         setShowMoreBtn(false);
@@ -92,10 +96,12 @@ function DashComments() {
 
         return updatedComments;
       });
+
+      setUserCommentsLoading(false);
     } catch (error) {
-      console.error(
-        "There was a problem with the fetch operation:",
-        error.message
+      setUserCommentsLoading(false);
+      setUserCommentsError(
+        `There was a problem with the fetch operation: ${error.message}`
       );
     }
   };
@@ -176,11 +182,6 @@ function DashComments() {
               ))}
             </TableBody>
           </Table>
-          {showMoreBtn && (
-            <Button className="mt-3 mx-auto" onClick={handleShowMoreBtn}>
-              Show more...
-            </Button>
-          )}
         </>
       )}
 
@@ -191,8 +192,14 @@ function DashComments() {
         </div>
       )}
 
+      {!userCommentsLoading && showMoreBtn && (
+        <Button className="mt-3 mx-auto" onClick={handleShowMoreBtn}>
+          Show more...
+        </Button>
+      )}
+
       {noComments && (
-        <p className="text-center font-semibold mt-3">
+        <p className="text-center font-semibold mt-3 text-red-500">
           There are no comments yet...
         </p>
       )}

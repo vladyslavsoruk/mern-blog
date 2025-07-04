@@ -12,6 +12,7 @@ import {
   TableHeadCell,
   TableRow,
 } from "flowbite-react";
+import { set } from "mongoose";
 import { useEffect, useState } from "react";
 import { FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
 import { useSelector } from "react-redux";
@@ -77,13 +78,17 @@ function DashPosts() {
   const handleShowMoreBtn = async () => {
     const startIndex = userPosts.length;
     try {
+      setUserPostsLoading(true);
       const response = await fetch(
         `/api/post/get?authorId=${currentUser._id}&startIndex=${startIndex}`
       );
+
       if (!response.ok) {
-        console.error("Something went wrong while fetching posts");
+        setUserPostsLoading(false);
+        setUserPostsError("Something went wrong while fetching posts");
         return;
       }
+
       const data = await response.json();
       if (data.posts.length < 9) {
         setShowMoreBtn(false);
@@ -98,10 +103,12 @@ function DashPosts() {
 
         return updatedPosts;
       });
+
+      setUserPostsLoading(false);
     } catch (error) {
-      console.error(
-        "There was a problem with the fetch operation:",
-        error.message
+      setUserPostsLoading(false);
+      setUserPostsError(
+        `There was a problem with the fetch operation: ${error.message}`
       );
     }
   };
@@ -199,12 +206,12 @@ function DashPosts() {
               ))}
             </TableBody>
           </Table>
-          {showMoreBtn && (
-            <Button className="mt-3 mx-auto" onClick={handleShowMoreBtn}>
-              Show more...
-            </Button>
-          )}
         </>
+      )}
+      {!userPostsLoading && showMoreBtn && (
+        <Button className="mt-3 mx-auto" onClick={handleShowMoreBtn}>
+          Show more...
+        </Button>
       )}
 
       {userPostsLoading && (
@@ -215,7 +222,7 @@ function DashPosts() {
       )}
 
       {noPosts && (
-        <p className="text-center font-semibold mt-3">
+        <p className="text-center font-semibold mt-3 text-red-500">
           You have no posts yet...
         </p>
       )}

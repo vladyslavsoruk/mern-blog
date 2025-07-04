@@ -11,19 +11,27 @@ import {
   NavbarToggle,
   TextInput,
 } from "flowbite-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AiOutlineSearch } from "react-icons/ai";
 import { FaMoon } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { toggleTheme } from "../redux/theme/themeSlice";
 import { signOutSuccess } from "../redux/user/userSlice";
+import { useEffect, useRef, useState } from "react";
 
 function Header() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const smallScreenSearchInputRef = useRef(null);
+  const [smallScreenSearch, setSmallScreenSearch] = useState(false);
+
   const path = useLocation().pathname;
+  const location = useLocation();
 
   const { user: currentUser } = useSelector((state) => state.user);
 
   const dispatch = useDispatch();
+
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
@@ -31,12 +39,39 @@ function Header() {
         method: "POST",
       });
       if (!response.ok) {
-        return new Error("Failed to logout");
+        console.error("Failed to logout");
+        return;
       }
       dispatch(signOutSuccess()); // Clear user state on logout
     } catch (error) {
       console.error("Logout error:", error.message);
     }
+  };
+
+  // когда smallScreenSearch становится true, даём фокус на TextInput
+  useEffect(() => {
+    if (smallScreenSearch && smallScreenSearchInputRef.current) {
+      smallScreenSearchInputRef.current.focus();
+    }
+  }, [smallScreenSearch]);
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const searchTermFromUrl = urlParams.get("searchTerm");
+    if (searchTermFromUrl) {
+      setSearchTerm(searchTermFromUrl);
+    }
+  }, [location.search]);
+
+  const handleSearchPosts = (e) => {
+    e.preventDefault();
+    setSmallScreenSearch(false);
+    const urlParams = new URLSearchParams(location.search);
+    urlParams.set("searchTerm", searchTerm);
+    const searchQuery = urlParams.toString();
+    // if (searchTerm) {
+    navigate(`/search?${searchQuery}`);
+    // }
   };
 
   return (
@@ -51,18 +86,40 @@ function Header() {
         Blog
       </Link>
 
-      <form>
-        <TextInput
-          type="text"
-          placeholder="Search..."
-          rightIcon={AiOutlineSearch}
-          className="hidden lg:block"
-        />
+      <form onSubmit={handleSearchPosts}>
+        {!smallScreenSearch && (
+          <TextInput
+            type="text"
+            placeholder="Search..."
+            rightIcon={AiOutlineSearch}
+            className="hidden lg:block"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        )}
+        {smallScreenSearch && (
+          <TextInput
+            type="text"
+            ref={smallScreenSearchInputRef}
+            placeholder="Search..."
+            rightIcon={AiOutlineSearch}
+            className="w-40 lg:hidden"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        )}
       </form>
 
-      <Button className="px-3 py-1 lg:hidden cursor-pointer" color="light" pill>
-        <AiOutlineSearch className="text-2xl text-gray-500" />
-      </Button>
+      {!smallScreenSearch && (
+        <Button
+          className="px-3 py-1 lg:hidden cursor-pointer"
+          color="light"
+          pill
+          onClick={() => setSmallScreenSearch(true)}
+        >
+          <AiOutlineSearch className="text-lg" />
+        </Button>
+      )}
 
       <div className="flex gap-4 md:order-2 items-center">
         <Button
