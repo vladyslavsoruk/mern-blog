@@ -6,6 +6,8 @@ import userRouter from "./routes/user.route.js";
 import cookieParser from "cookie-parser";
 import postRouter from "./routes/post.route.js";
 import commentRouter from "./routes/comment.route.js";
+import path from "path";
+
 dotenv.config();
 
 const app = express();
@@ -18,19 +20,26 @@ mongoose
   .then(() => console.log("✅ Подключено к MongoDB"))
   .catch((err) => console.error("❌ Ошибка подключения:", err));
 
+const __dirname = path.resolve();
+
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 app.use("/api/post", postRouter);
 app.use("/api/comment", commentRouter);
 
-// app.get("/", async (req, res) => {
-//   try {
-//     const users = await User.find({});
-//     res.status(200).send(users);
-//   } catch (error) {
-//     res.status(500).send(error);
-//   }
-// });
+// собранные бандлы (HTML, JS, CSS, картинки и т.д.)
+// будут доступными, и приложение фронтенда сможет
+// подгрузить все свои ресурсы
+app.use(express.static(path.join(__dirname, "/client/dist")));
+
+// Любой запрос (за исключением тех, что попали под express.static
+// или другие серверные app.get("/api/…")) будет пойман этим
+// app.get("*", …) и всегда отдаст один и тот же index.html.
+// То есть приложение на стороне клиента сможет обрабатывать URL
+// самостоятельно с помощью react-router
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "/client/dist/index.html"));
+});
 
 app.listen(3000, () => {
   console.log("Server is running on port 3000!!!");
