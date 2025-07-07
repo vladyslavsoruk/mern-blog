@@ -89,31 +89,35 @@ function Header() {
         Blog
       </Link>
 
-      <form onSubmit={handleSearchPosts}>
-        {!smallScreenSearch && (
+      {!smallScreenSearch && (
+        <form onSubmit={handleSearchPosts} className="hidden lg:block">
           <TextInput
             type="text"
             placeholder="Search..."
             rightIcon={AiOutlineSearch}
-            className="hidden lg:block"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-        )}
-        {smallScreenSearch && (
+        </form>
+      )}
+
+      {smallScreenSearch && (
+        <form
+          onSubmit={handleSearchPosts}
+          className="w-40 lg:hidden max-w-[400px]-order-2"
+        >
           <TextInput
             type="text"
             ref={smallScreenSearchInputRef}
             placeholder="Search..."
             rightIcon={AiOutlineSearch}
-            className="w-40 lg:hidden"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             // if focus on TextInput is lost, set smallScreenSearch to false
             onBlur={() => setSmallScreenSearch(false)}
           />
-        )}
-      </form>
+        </form>
+      )}
 
       {!smallScreenSearch && (
         <Button
@@ -126,7 +130,11 @@ function Header() {
         </Button>
       )}
 
-      <div className="flex gap-6 md:order-2 items-center">
+      <div
+        className={`${
+          smallScreenSearch && "order-1 max-[400px]:hidden"
+        } flex gap-6 md:order-2 items-center`}
+      >
         <Button
           className="p-1 hidden sm:inline cursor-pointer"
           pill
@@ -136,7 +144,7 @@ function Header() {
           {theme === "light" ? <MdLightMode className="text-lg" /> : <FaMoon />}
         </Button>
 
-        {currentUser ? (
+        {currentUser && (
           <Dropdown
             arrowIcon={false}
             inline
@@ -145,7 +153,7 @@ function Header() {
                 alt="User settings"
                 img={currentUser.profilePicture}
                 rounded={true}
-                className="cursor-pointer transition duration-200 hover:brightness-75"
+                className={`cursor-pointer transition duration-200 hover:brightness-75`}
               />
             }
           >
@@ -163,15 +171,19 @@ function Header() {
             <DropdownDivider />
             <DropdownItem onClick={handleLogout}>Logout</DropdownItem>
           </Dropdown>
-        ) : (
+        )}
+
+        {!currentUser && (
           <Link to="/sign-in">
-            <Button className="bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 text-white hover:bg-gradient-to-br focus:ring-blue-300 dark:focus:ring-blue-800 cursor-pointer">
+            <Button
+              className={`bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 text-white hover:bg-gradient-to-br focus:ring-blue-300 dark:focus:ring-blue-800 cursor-pointer`}
+            >
               Sign In
             </Button>
           </Link>
         )}
 
-        <NavbarToggle className="cursor-pointer" />
+        <NavbarToggle className={`cursor-pointer`} />
       </div>
 
       <NavbarCollapse>

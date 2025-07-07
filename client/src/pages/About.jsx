@@ -3,14 +3,14 @@ function About() {
     <div className="min-h-[calc(100vh-72px)] flex justify-center items-center">
       <div className="max-w-2xl mx-auto p-3 text-center">
         <div>
-          <h1 className="text-3xl font-semibold my-7">
+          <h1 className="text-3xl md:text-4xl font-bold my-7">
             About{" "}
             <span className="px-2 py-1 bg-gradient-to-r from-pink-500 via-purple-500 to-violet-500 rounded-lg text-white">
               Vlad's
             </span>{" "}
             Blog
           </h1>
-          <div className="text-md text-gray-500 flex flex-col gap-6 text-justify">
+          <div className="md:text-lg text-gray-600 dark:text-gray-400 text-justify flex flex-col gap-6">
             <p>
               Welcome to{" "}
               <span className="px-2 py-1 bg-gradient-to-r from-pink-500 via-purple-500 to-violet-500 rounded-lg text-white">

@@ -14,6 +14,7 @@ import {
   BsLinkedin,
   BsTwitter,
   BsInstagram,
+  BsTelegram,
 } from "react-icons/bs";
 
 function FooterComponent() {
@@ -34,38 +35,59 @@ function FooterComponent() {
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-6">
             <div>
-              <FooterTitle title="About" />
+              <FooterTitle title="About" className="text-gray-800" />
               <FooterLinkGroup col>
-                <FooterLink href="#" target="_blank" rel="noopener noreferrer">
-                  About Us
+                <FooterLink as={"div"} className="dark:text-gray-400">
+                  <Link to="/about">About Us</Link>
                 </FooterLink>
-                <FooterLink href="#" target="_blank" rel="noopener noreferrer">
+                <FooterLink
+                  href="https://t.me/vladsoruk"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="dark:text-gray-400"
+                >
                   Contact Us
                 </FooterLink>
               </FooterLinkGroup>
             </div>
             <div>
-              <FooterTitle title="Follow us" />
+              <FooterTitle title="Follow us" className="text-gray-800" />
               <FooterLinkGroup col>
                 <FooterLink
                   href="https://github.com/vladyslavsoruk"
                   target="_blank"
                   rel="noopener noreferrer"
+                  className="dark:text-gray-400"
                 >
                   Github
                 </FooterLink>
-                <FooterLink href="#" target="_blank" rel="noopener noreferrer">
+                <FooterLink
+                  href="https://t.me/vladsoruk"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="dark:text-gray-400"
+                >
                   Telegram
                 </FooterLink>
               </FooterLinkGroup>
             </div>
             <div>
-              <FooterTitle title="Legal" />
+              <FooterTitle title="Legal" className="text-gray-800" />
               <FooterLinkGroup col>
-                <FooterLink href="#" target="_blank" rel="noopener noreferrer">
+                <FooterLink
+                  href="https://t.me/vladsoruk"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="dark:text-gray-400"
+                >
                   Privacy Policy
                 </FooterLink>
-                <FooterLink href="#" target="_blank" rel="noopener noreferrer">
+                <FooterLink
+                  href="https://t.me/vladsoruk"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="dark:text-gray-400"
+                >
                   Terms & Conditions
                 </FooterLink>
               </FooterLinkGroup>
@@ -82,11 +104,46 @@ function FooterComponent() {
             year={new Date().getFullYear()}
           />
           <div className="flex gap-4">
-            <FooterIcon href="#" icon={BsFacebook} />
-            <FooterIcon href="#" icon={BsGithub} />
-            <FooterIcon href="#" icon={BsLinkedin} />
-            <FooterIcon href="#" icon={BsTwitter} />
-            <FooterIcon href="#" icon={BsInstagram} />
+            <FooterIcon
+              href="https://t.me/vladsoruk"
+              target="_blank"
+              rel="noopener noreferrer"
+              icon={BsFacebook}
+              className="hover:text-cyan-600 transition-all duration-300"
+            />
+            <FooterIcon
+              href="https://github.com/vladyslavsoruk"
+              target="_blank"
+              rel="noopener noreferrer"
+              icon={BsGithub}
+              className="hover:text-cyan-600 transition-all duration-300"
+            />
+            <FooterIcon
+              href="#"
+              icon={BsLinkedin}
+              className="hover:text-cyan-600 transition-all duration-300"
+            />
+            <FooterIcon
+              href="https://t.me/vladsoruk"
+              target="_blank"
+              rel="noopener noreferrer"
+              icon={BsTwitter}
+              className="hover:text-cyan-600 transition-all duration-300"
+            />
+            <FooterIcon
+              href="https://t.me/vladsoruk"
+              target="_blank"
+              rel="noopener noreferrer"
+              icon={BsInstagram}
+              className="hover:text-cyan-600 transition-all duration-300"
+            />
+            <FooterIcon
+              href="https://t.me/vladsoruk"
+              target="_blank"
+              rel="noopener noreferrer"
+              icon={BsTelegram}
+              className="hover:text-cyan-600 transition-all duration-300"
+            />
           </div>
         </div>
       </div>

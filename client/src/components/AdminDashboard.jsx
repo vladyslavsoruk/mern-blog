@@ -347,7 +347,7 @@ function AdminDashboard() {
       </div>
 
       {/* Tables with data for admin */}
-      <div className="flex flex-wrap gap-4 justify-center">
+      <div className="flex flex-wrap gap-6 justify-center my-6">
         {renderUsersTable()}
         {renderCommentsTable()}
         {renderPostsTable()}

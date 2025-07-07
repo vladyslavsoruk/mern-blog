@@ -40,11 +40,9 @@ function PostPage() {
         setPost(data.posts[0]);
 
         if (rPostsData.posts.some((p) => p._id === data.posts[0]._id)) {
-          console.log("data.posts.includes(post)!!!");
           const r = await fetch("/api/post/get?limit=4");
           const d = await r.json();
           setRecentPosts(d.posts.filter((p) => p._id !== data.posts[0]._id));
-          console.log(d.posts.filter((p) => p._id !== data.posts[0]._id));
         } else {
           setRecentPosts(rPostsData.posts);
         }

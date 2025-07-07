@@ -51,12 +51,11 @@ function Search() {
     const searchData = getSidebarDataFromURL(location.search);
 
     const fetchPosts = async () => {
-      console.log("FETCHING POSTS!!!");
-      console.log(searchData);
-
       try {
         setLoading(true);
         setError(null);
+        setShowMoreBtn(false);
+
         let response = null;
 
         if (searchData.category === "all") {
@@ -86,6 +85,7 @@ function Search() {
       } catch (error) {
         setLoading(false);
         setError(error.message);
+        setShowMoreBtn(false);
         console.error(
           "There was a problem with the fetch operation:",
           error.message
@@ -98,6 +98,7 @@ function Search() {
   const handleShowMoreBtn = async () => {
     const startIndex = posts.length;
     try {
+      setShowMoreBtn(false);
       setLoading(true);
 
       let response = null;
@@ -120,8 +121,9 @@ function Search() {
       }
 
       const data = await response.json();
-      if (data.posts.length < 9) {
-        setShowMoreBtn(false);
+
+      if (data.posts.length === 9) {
+        setShowMoreBtn(true);
       }
 
       setPosts((prevPosts) => {
@@ -154,7 +156,7 @@ function Search() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-72px)] flex flex-col md:flex-row max-w-screen-2xl mx-auto">
+    <div className="min-h-[calc(100vh-72px)] flex flex-col md:flex-row max-w-screen-2xl mx-auto mb-4">
       <div className="p-7 md:border-r">
         <form
           onSubmit={handleSearchPostsSubmit}
@@ -235,12 +237,13 @@ function Search() {
           </div>
         )}
         {showMoreBtn && (
-          <Button className="mx-auto my-5" outline onClick={handleShowMoreBtn}>
+          <Button className="mx-auto mt-5" outline onClick={handleShowMoreBtn}>
             Show more
           </Button>
         )}
         {loading && (
-          <div className="justify-self-center">
+          // <div className="justify-self-center mt-5">
+          <div className="mx-auto mt-5 text-center">
             <Spinner size="lg" />
             <span className="ml-2 font-semibold text-lg">Loading...</span>
           </div>

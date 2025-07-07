@@ -94,8 +94,6 @@ function DashProfile() {
       ...prevData,
       [id]: value,
     }));
-
-    console.log(formData);
   };
 
   const handleSubmit = async (e) => {

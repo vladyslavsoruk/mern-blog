@@ -30,9 +30,9 @@ function DashUsers() {
   const [showMoreBtn, setShowMoreBtn] = useState(true);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [userToDeleteData, setUserToDeleteData] = useState(null);
-  const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
   const [usersError, setUsersError] = useState(false);
   const [usersLoading, setUsersLoading] = useState(false);
+  const [deleteUserNotifications, setDeleteUserNotifications] = useState([]);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -148,11 +148,16 @@ function DashUsers() {
           prevUsers.filter((user) => user._id !== userToDeleteData.id)
         );
 
-        setShowDeleteSuccess(true);
+        setDeleteUserNotifications((prevNotifications) => [
+          userToDeleteData,
+          ...prevNotifications,
+        ]);
 
         setTimeout(() => {
-          setShowDeleteSuccess(false);
-        }, 3000);
+          setDeleteUserNotifications((prevUserToDelete) =>
+            prevUserToDelete.filter((u) => u.id !== userToDeleteData.id)
+          );
+        }, 5000);
       }
     } catch (error) {
       console.error(
@@ -163,7 +168,7 @@ function DashUsers() {
   };
 
   return (
-    <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-gray-400 dark:scrollbar-track-gray-700 dark:scrollbar-thumb-gray-500">
+    <div className="table-auto overflow-x-scroll mb-4 md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-gray-400 dark:scrollbar-track-gray-700 dark:scrollbar-thumb-gray-500">
       {currentUser.isAdmin && usersData.length > 0 && (
         <>
           <Table hoverable className="shadow-md">
@@ -234,7 +239,7 @@ function DashUsers() {
       )}
 
       {usersLoading && (
-        <div className="text-center">
+        <div className="text-center my-4">
           <Spinner size="sm" />
           <span className="ml-2">Loading...</span>
         </div>
@@ -289,10 +294,21 @@ function DashUsers() {
           </div>
         </ModalBody>
       </Modal>
-      {showDeleteSuccess && (
-        <div className="flex gap-2 px-4 py-3 items-center fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white  rounded shadow-lg transition-opacity duration-500 animate-fade-in-out z-50">
-          <FaCheckCircle className="text-xl " />
-          <span>User was successfully deleted!</span>
+
+      {deleteUserNotifications.length > 0 && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 flex flex-col gap-2">
+          {deleteUserNotifications.map((u) => (
+            <div
+              key={u.id}
+              className="flex gap-2 px-4 py-3 items-center bg-green-500 text-white rounded shadow-lg transition-opacity animate-fade-in-out z-50"
+            >
+              <FaCheckCircle className="text-xl" />
+              <p>
+                User <span className="font-semibold">«{u.username}»</span> was
+                successfully deleted!
+              </p>
+            </div>
+          ))}
         </div>
       )}
     </div>

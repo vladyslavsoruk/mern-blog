@@ -13,8 +13,6 @@ function Dashboard() {
 
   const possibleTabs = ["dashboard", "profile", "posts", "users", "comments"];
 
-  console.log("TAB", tab);
-
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const currentTab = urlParams.get("tab");

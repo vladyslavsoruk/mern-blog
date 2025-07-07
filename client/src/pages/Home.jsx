@@ -28,8 +28,10 @@ function Home() {
   return (
     <div className="min-h-[calc(100vh-72px)]">
       <div className="flex flex-col gap-6 p-28 px-3 max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold lg:text-6xl">Welcome to my Blog</h1>
-        <p className="text-gray-500 text-xs sm:text-sm text-justify">
+        <h1 className="text-center text-3xl font-bold lg:text-6xl">
+          Welcome to my Blog
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base text-justify">
           Here you'll find a wide range of articles, tutorials, and resources
           designed to help you grow as a sdeveloper. Whether you're interested
           in web development, software engineering, programming languages, or
@@ -37,7 +39,7 @@ function Home() {
           everyone. Dive in and explore the content to expand your knowledge and
           skills!
         </p>
-        <Link to="/search">
+        <Link to="/search" className="self-center">
           <button className="text-xs sm:text-sm text-teal-500 font-bold hover:bg-teal-500 hover:text-white transition duration-300 py-2 px-4 border border-teal-500 rounded-md">
             View all posts
           </button>

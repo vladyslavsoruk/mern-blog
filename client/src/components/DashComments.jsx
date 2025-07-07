@@ -132,7 +132,7 @@ function DashComments() {
   };
 
   return (
-    <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-gray-400 dark:scrollbar-track-gray-700 dark:scrollbar-thumb-gray-500">
+    <div className="table-auto overflow-x-scroll mb-4 md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-gray-400 dark:scrollbar-track-gray-700 dark:scrollbar-thumb-gray-500">
       {currentUser.isAdmin && userComments.length > 0 && (
         <>
           <Table hoverable className="shadow-md">
@@ -186,7 +186,7 @@ function DashComments() {
       )}
 
       {userCommentsLoading && (
-        <div className="text-center">
+        <div className="text-center my-4">
           <Spinner size="sm" />
           <span className="ml-2">Loading...</span>
         </div>

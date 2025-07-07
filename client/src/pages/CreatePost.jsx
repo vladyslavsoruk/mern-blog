@@ -45,8 +45,6 @@ function CreatePost() {
       ...prevData,
       [id]: value,
     }));
-
-    console.log(formData);
   };
 
   const handleImageUpload = async () => {

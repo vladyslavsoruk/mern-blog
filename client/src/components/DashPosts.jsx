@@ -25,9 +25,9 @@ function DashPosts() {
   const [showMoreBtn, setShowMoreBtn] = useState(true);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [postToDeleteData, setPostToDeleteData] = useState(null);
-  const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
   const [userPostsError, setUserPostsError] = useState(false);
   const [userPostsLoading, setUserPostsLoading] = useState(false);
+  const [deletePostNotifications, setDeletePostNotifications] = useState([]);
 
   useEffect(() => {
     if (!currentUser.isAdmin) {
@@ -127,11 +127,16 @@ function DashPosts() {
           prevPosts.filter((post) => post._id !== postToDeleteData.id)
         );
 
-        setShowDeleteSuccess(true);
+        setDeletePostNotifications((prevNotifications) => [
+          postToDeleteData,
+          ...prevNotifications,
+        ]);
 
         setTimeout(() => {
-          setShowDeleteSuccess(false);
-        }, 3000);
+          setDeletePostNotifications((prevPostToDelete) =>
+            prevPostToDelete.filter((p) => p.id !== postToDeleteData.id)
+          );
+        }, 5000);
       }
     } catch (error) {
       console.error(
@@ -142,7 +147,7 @@ function DashPosts() {
   };
 
   return (
-    <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-gray-400 dark:scrollbar-track-gray-700 dark:scrollbar-thumb-gray-500">
+    <div className="table-auto overflow-x-scroll mb-4 md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-gray-400 dark:scrollbar-track-gray-700 dark:scrollbar-thumb-gray-500">
       {currentUser.isAdmin && userPosts.length > 0 && (
         <>
           <Table hoverable className="shadow-md">
@@ -215,7 +220,7 @@ function DashPosts() {
       )}
 
       {userPostsLoading && (
-        <div className="text-center">
+        <div className="text-center my-4">
           <Spinner size="sm" />
           <span className="ml-2">Loading...</span>
         </div>
@@ -260,10 +265,20 @@ function DashPosts() {
         </ModalBody>
       </Modal>
 
-      {showDeleteSuccess && (
-        <div className="flex gap-2 px-4 py-3 items-center fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white  rounded shadow-lg transition-opacity duration-500 animate-fade-in-out z-50">
-          <FaCheckCircle className="text-xl " />
-          <span>Post was successfully deleted!</span>
+      {deletePostNotifications.length > 0 && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 flex flex-col gap-2">
+          {deletePostNotifications.map((p) => (
+            <div
+              key={p.id}
+              className="flex gap-2 px-4 py-3 items-center bg-green-500 text-white rounded shadow-lg transition-opacity animate-fade-in-out z-50"
+            >
+              <FaCheckCircle className="text-xl" />
+              <p>
+                Post <span className="font-semibold">«{p.title}»</span> was
+                successfully deleted!
+              </p>
+            </div>
+          ))}
         </div>
       )}
     </div>

@@ -119,7 +119,7 @@ function SignIn() {
             >
               {loading ? (
                 <>
-                  <Spinner size="sm" />
+                  <Spinner size="sm" className="dark:text-gray-200" />
                   <span className="ml-2">Loading...</span>
                 </>
               ) : (

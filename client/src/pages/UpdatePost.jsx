@@ -68,8 +68,6 @@ function UpdatePost() {
       ...prevData,
       [id]: value,
     }));
-
-    console.log(formData);
   };
 
   const handleImageUpload = async () => {
@@ -144,8 +142,6 @@ function UpdatePost() {
     if (!imageFileUrl && postData?.image) {
       delete postData.image;
     }
-
-    console.log("POSTDATA:", postData);
 
     try {
       const response = await fetch(

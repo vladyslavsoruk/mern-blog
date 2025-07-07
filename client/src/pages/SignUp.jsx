@@ -8,6 +8,7 @@ function SignUp() {
   const [userData, setUserData] = useState({});
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -112,7 +113,7 @@ function SignUp() {
             >
               {loading ? (
                 <>
-                  <Spinner size="sm" />
+                  <Spinner size="sm" className="dark:text-gray-200" />
                   <span className="ml-2">Loading...</span>
                 </>
               ) : (

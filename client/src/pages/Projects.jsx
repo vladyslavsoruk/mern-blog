@@ -42,8 +42,10 @@ import CallToAction from "../components/CallToAction";
 export default function Projects() {
   return (
     <div className="min-h-[calc(100vh-72px)] max-w-4xl mx-auto flex justify-center gap-8 items-center flex-col p-6">
-      <h1 className="text-4xl font-bold text-center">Explore Our Projects</h1>
-      <p className="text-lg text-gray-600 dark:text-gray-400 text-justify">
+      <h1 className="text-3xl md:text-4xl font-bold text-center">
+        Explore Our Projects
+      </h1>
+      <p className="md:text-lg text-gray-600 dark:text-gray-400 text-justify">
         Dive into a curated set of hands‑on NestJS tutorials designed to take
         you from zero to production‑ready back‑end developer. Whether you're
         just getting started with TypeScript or looking to build scalable,
@@ -52,7 +54,9 @@ export default function Projects() {
       </p>
       <div className="w-full flex flex-col gap-6">
         <section className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl font-semibold">Why Learn NestJS?</h2>
+          <h2 className="text-xl md:text-2xl font-semibold">
+            Why Learn NestJS?
+          </h2>
           <p className="text-gray-700 dark:text-gray-400 mt-2 text-justify">
             NestJS combines the power of TypeScript, the flexibility of Express
             (or Fastify), and a modular architecture inspired by Angular.
@@ -61,7 +65,9 @@ export default function Projects() {
           </p>
         </section>
         <section className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl font-semibold">What You'll Master</h2>
+          <h2 className="text-xl md:text-2xl font-semibold">
+            What You'll Master
+          </h2>
           <ul className="list-disc list-inside text-gray-700 dark:text-gray-400 mt-2">
             <li>
               Creating controllers, providers, and modules for clean
