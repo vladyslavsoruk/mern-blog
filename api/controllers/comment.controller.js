@@ -1,4 +1,4 @@
-import { errorHandler } from "../../utils/error.js";
+import { errorHandler } from "../utils/error.js";
 import Comment from "../models/comment.model.js";
 import Post from "../models/post.model.js";
 

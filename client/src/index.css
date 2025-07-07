@@ -67,3 +67,7 @@ body {
 .dark .ql-editor.ql-blank::before {
   color: #6b7280; /* tailwind gray-500 */
 }
+
+.dark .ql-snow.ql-container .ql-editor p a {
+  color: rgb(157, 196, 235) !important;
+}
