@@ -7,12 +7,13 @@ import {
   TextInput,
 } from "flowbite-react";
 import { RxCross2 } from "react-icons/rx";
-import { useState } from "react";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
+import { lazy, Suspense, useState } from "react";
+// import ReactQuill from "react-quill";
+// import "react-quill/dist/quill.snow.css";
 import { useRef } from "react";
 import { Link } from "react-router-dom";
-import { set } from "mongoose";
+// ленивая загрузка редактора
+const ReactQuill = lazy(() => import("react-quill"));
 
 function CreatePost() {
   const [contentValue, setContentValue] = useState("");
@@ -248,14 +249,29 @@ function CreatePost() {
             </Alert>
           )}
         </div>
-        <ReactQuill
+        <Suspense
+          fallback={
+            <div className="h-72 flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+              <Spinner size="xl" />
+            </div>
+          }
+        >
+          <ReactQuill
+            theme="snow"
+            value={contentValue}
+            onChange={setContentValue}
+            className="h-72 mb-12"
+            placeholder="Write your post content here..."
+          />
+        </Suspense>
+        {/* <ReactQuill
           theme="snow"
           value={contentValue}
           onChange={setContentValue}
           className="h-72 mb-12"
           required
           placeholder="Write your post content here..."
-        />
+        /> */}
         <Button
           type="submit"
           color={"green"}

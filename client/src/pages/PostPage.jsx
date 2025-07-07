@@ -77,7 +77,11 @@ function PostPage() {
       <div className="flex w-full max-w-2xl text-xs items-center justify-between p-3 border-b border-gray-300">
         <span>{new Date(post?.createdAt).toLocaleDateString()}</span>
         <span className="italic">
-          {(post?.content.length / 1_000).toFixed(0)} mins read
+          {(post?.content.length / 1_000).toFixed(0) === 1
+            ? `${(post?.content.length / 1_000).toFixed(0)} min read`
+            : (post?.content.length / 1_000).toFixed(0) > 1
+            ? `${(post?.content.length / 1_000).toFixed(0)} mins read`
+            : ""}
         </span>
       </div>
       <div

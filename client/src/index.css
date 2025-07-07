@@ -1,3 +1,6 @@
+/* CSS Quill подтягиваем глобально один раз */
+@import "react-quill/dist/quill.snow.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -34,4 +37,33 @@ body {
 }
 .post-content a:hover {
   text-decoration: underline;
+}
+
+/* React-Quill в dark mode */
+.dark .ql-snow .ql-picker.ql-header .ql-picker-label::before {
+  color: #a4abb8;
+}
+
+.dark .ql-snow.ql-toolbar .ql-picker.ql-header:hover .ql-picker-label::before {
+  color: #06c !important;
+}
+
+.dark
+  .ql-snow.ql-toolbar
+  .ql-picker.ql-header
+  .ql-picker-label.ql-active::before {
+  color: #06c !important;
+}
+
+.dark .ql-snow .ql-stroke {
+  stroke: #a4abb8;
+}
+
+/* Меняем цвет плейсхолдера */
+.ql-editor.ql-blank::before {
+  color: #9ca3af;
+}
+
+.dark .ql-editor.ql-blank::before {
+  color: #6b7280; /* tailwind gray-500 */
 }
