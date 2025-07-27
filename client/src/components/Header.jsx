@@ -153,7 +153,7 @@ function Header() {
                 alt="User settings"
                 img={currentUser.profilePicture}
                 rounded={true}
-                className={`cursor-pointer transition duration-200 hover:brightness-75`}
+                className={`cursor-pointer object-cover transition duration-200 hover:brightness-75`}
               />
             }
           >

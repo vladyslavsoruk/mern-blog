@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import Comment from "./comment.model.js";
 
 const postSchema = new mongoose.Schema(
   {
@@ -47,6 +48,15 @@ const postSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// Delete post comments before delete post
+postSchema.pre("findOneAndDelete", async function (next) {
+  const post = await this.model.findOne(this.getQuery());
+  if (post) {
+    await Comment.deleteMany({ post: post._id });
+  }
+  next();
+});
 
 const Post = mongoose.model("Post", postSchema);
 export default Post;

@@ -181,7 +181,7 @@ function CommentSection({ postId }) {
             <img
               src={currentUser.profilePicture}
               alt="user-profile-picture"
-              className="w-6 h-6 rounded-full object-contain transition duration-200 group-hover:brightness-75"
+              className="w-6 h-6 rounded-full object-cover transition duration-200 group-hover:brightness-75"
             />
             <span className="text-xs text-cyan-600 group-hover:underline">
               @{currentUser.username}

@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import Comment from "./comment.model.js";
 
 const userSchema = new mongoose.Schema(
   {
@@ -28,6 +29,15 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// Delete user`s comments before delete user
+userSchema.pre("findOneAndDelete", async function (next) {
+  const user = await this.model.findOne(this.getQuery());
+  if (user) {
+    await Comment.deleteMany({ author: user._id });
+  }
+  next();
+});
 
 const User = mongoose.model("User", userSchema);
 export default User;

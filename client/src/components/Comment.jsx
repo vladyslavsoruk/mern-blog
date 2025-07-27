@@ -82,7 +82,7 @@ function Comment({
         <img
           src={commentData?.author.profilePicture}
           alt="user-profile-picture"
-          className="w-10 h-10 rounded-full bg-gray-200 object-contain transition duration-200 hover:brightness-75"
+          className="w-10 h-10 rounded-full bg-gray-200 object-cover transition duration-200 hover:brightness-75"
         />
       </div>
       <div className="flex-1">

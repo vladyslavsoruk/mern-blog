@@ -194,7 +194,7 @@ function DashUsers() {
                       <img
                         src={user.profilePicture}
                         alt="user-profile-picture"
-                        className="w-full h-full rounded-full"
+                        className="w-full h-full rounded-full object-cover"
                       />
                     </div>
                   </TableCell>

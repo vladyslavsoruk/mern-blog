@@ -84,7 +84,7 @@ function PostPage() {
       </div>
       <div
         dangerouslySetInnerHTML={{ __html: post?.content }}
-        className="mt-10 p-3 text-jus   tify w-full max-w-2xl mx-auto post-content"
+        className="mt-10 p-3 text-justify w-full max-w-2xl mx-auto post-content"
       ></div>
       <div className="max-w-4xl w-full mx-auto">
         <CallToAction />

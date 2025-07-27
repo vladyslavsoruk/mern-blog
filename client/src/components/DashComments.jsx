@@ -160,9 +160,9 @@ function DashComments() {
                   </TableCell>
                   <TableCell>{comment.numberOfLikes}</TableCell>
                   <TableCell>
-                    <Link to={`/post/${comment.post.slug}`}>
+                    <Link to={`/post/${comment.post?.slug}`}>
                       <span className="hover:underline font-medium text-gray-900 dark:text-white">
-                        {comment.post.title}
+                        {comment.post?.title}
                       </span>
                     </Link>
                   </TableCell>

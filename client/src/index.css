@@ -71,3 +71,8 @@ body {
 .dark .ql-snow.ql-container .ql-editor p a {
   color: rgb(157, 196, 235) !important;
 }
+
+/* Flowbite user avatar in Header fix */
+img[alt="User settings"] {
+  object-fit: cover;
+}

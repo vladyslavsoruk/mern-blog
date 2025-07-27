@@ -33,11 +33,10 @@ function Home() {
         </h1>
         <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base text-justify">
           Here you'll find a wide range of articles, tutorials, and resources
-          designed to help you grow as a sdeveloper. Whether you're interested
-          in web development, software engineering, programming languages, or
-          best practices in the tech industry, there's something here for
-          everyone. Dive in and explore the content to expand your knowledge and
-          skills!
+          designed to help you grow as a developer. Whether you're interested in
+          web development, software engineering, programming languages, or best
+          practices in the tech industry, there's something here for everyone.
+          Dive in and explore the content to expand your knowledge and skills!
         </p>
         <Link to="/search" className="self-center">
           <button className="text-xs sm:text-sm text-teal-500 font-bold hover:bg-teal-500 hover:text-white transition duration-300 py-2 px-4 border border-teal-500 rounded-md">
