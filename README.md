@@ -20,10 +20,9 @@ A blogging platform built with **React, Redux & Tailwind** on the front end, and
 
 1.  - Run Express server and connect to MongoDB:
       `bash
-$ npm run dev`
+$ npm run dev` - Run React app: `bash
 
-- Run React app: `bash
-$ cd client
-  $ npm run dev`
+            $ cd client
+            $ npm run dev`
 
 1.  App should be running on `http://localhost:5173/`
