@@ -18,11 +18,8 @@ A blogging platform built with **React, Redux & Tailwind** on the front end, and
     `VITE_CLOUDINARY_URL=https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/upload`
     `VITE_CLOUDINARY_UPLOAD_PRESET=YOUR_UPLOAD_PRESET`
 
-1.  - Run Express server and connect to MongoDB:
-      `bash
-$ npm run dev` - Run React app: `bash
+1.  Run Express server and connect to MongoDB: `npm run dev`
 
-            $ cd client
-            $ npm run dev`
+1.  Run React app: `cd client`, `npm run dev`
 
 1.  App should be running on `http://localhost:5173/`
